@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+/* ESUN Brand Identity */
+:root {
+  --background: #090806;   /* Warm Obsidian */
+  --foreground: #ffffff;   /* Text */
+  --inferno: #a81123;      /* Buttons / Actions */
+  --desert-ash: #8c7656;   /* Accents / Borders */
+  --inferno-hover: #c9142a;
+  --desert-ash-muted: rgba(140, 118, 86, 0.4);
+  --sand-light: rgba(201, 173, 132, 0.25);
+  --sand-soft: rgba(181, 155, 114, 0.14);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-inferno: var(--inferno);
+  --color-desert-ash: var(--desert-ash);
+  --font-sans: var(--font-arabic), Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(1200px 700px at 88% 7%, var(--sand-light), transparent 65%),
+    radial-gradient(900px 600px at 12% 88%, var(--sand-soft), transparent 65%),
+    linear-gradient(135deg, #0a0908 0%, #12100d 38%, #060606 74%, #0d0c0a 100%);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-arabic), Helvetica, Arial, sans-serif;
+  font-weight: 400;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 70% 20%, rgba(255, 220, 160, 0.06), transparent 45%),
+    radial-gradient(circle at 20% 75%, rgba(201, 173, 132, 0.05), transparent 40%);
+  mix-blend-mode: screen;
+  z-index: -1;
+}
+
+@keyframes ambientShift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(1%, -1%, 0) scale(1.03);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-arabic), Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+/* Glassmorphism base */
+.glass {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    160deg,
+    rgba(20, 18, 15, 0.78) 0%,
+    rgba(10, 9, 8, 0.72) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(170, 142, 104, 0.35);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+}
+
+.glass::after {
+  content: "";
+  position: absolute;
+  inset: -60% auto auto -40%;
+  width: 40%;
+  height: 220%;
+  transform: rotate(18deg);
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 231, 191, 0.08) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.glass:hover::after {
+  opacity: 1;
+  animation: ambientShift 1.8s ease-in-out;
+}
+
+/* Student ID format hint */
+input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* English / mixed input in RTL: let text direction follow content */
+[dir="rtl"] input:not([type="email"]):not([type="password"]),
+[dir="rtl"] textarea {
+  direction: auto;
+  unicode-bidi: plaintext;
+}
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="password"] {
+  direction: ltr;
+  text-align: left;
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  transition: all 220ms ease;
+}
