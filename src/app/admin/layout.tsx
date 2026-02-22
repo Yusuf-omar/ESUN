@@ -19,9 +19,10 @@ export default async function AdminLayout({
   return (
     <div className="min-h-screen bg-transparent">
       <header className="glass border-b border-[#8c7656]/30 sticky top-0 z-10">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
-          <span className="text-lg font-bold text-white">ESUN Admin</span>
-          <nav className="flex items-center gap-4">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6">
+          <span className="text-base font-bold text-white md:text-lg">ESUN Admin</span>
+          <nav className="w-full overflow-x-auto pb-1 md:w-auto md:pb-0">
+            <div className="flex min-w-max items-center gap-4">
             <Link href="/admin" className="text-sm text-white/80 transition hover:text-[#e7d4b0]">
               Dashboard
             </Link>
@@ -40,6 +41,7 @@ export default async function AdminLayout({
             <Link href="/admin/events" className="text-sm text-white/80 transition hover:text-[#e7d4b0]">
               Events
             </Link>
+            </div>
           </nav>
         </div>
       </header>

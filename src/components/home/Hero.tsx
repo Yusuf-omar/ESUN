@@ -31,7 +31,7 @@ export function Hero() {
         }}
       />
       <motion.div
-        className="relative flex flex-col items-center gap-8"
+        className="relative flex flex-col items-center gap-8 px-4"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -39,7 +39,7 @@ export function Hero() {
         <HeroLogo />
         <div className="text-center">
           <motion.h1
-            className="text-4xl font-bold tracking-tight text-white md:text-5xl lg:text-6xl"
+            className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -47,7 +47,7 @@ export function Hero() {
             {AR.hero.title}
           </motion.h1>
           <motion.p
-            className="mt-2 text-lg text-white/80 md:text-xl"
+            className="mt-2 text-base text-white/80 sm:text-lg md:text-xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -62,7 +62,7 @@ export function Hero() {
         >
           <motion.button
             onClick={scrollToJoin}
-            className="rounded-lg bg-[#a81123] px-8 py-4 text-lg font-bold text-white"
+            className="rounded-lg bg-[#a81123] px-6 py-3 text-base font-bold text-white sm:px-8 sm:py-4 sm:text-lg"
             whileTap={{ scale: 0.97 }}
             whileHover={{
               boxShadow: "0 0 24px rgba(168, 17, 35, 0.5)",

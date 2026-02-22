@@ -32,6 +32,12 @@ body {
   font-weight: 400;
 }
 
+@media (max-width: 768px) {
+  body {
+    background-attachment: scroll;
+  }
+}
+
 body::before {
   content: "";
   position: fixed;

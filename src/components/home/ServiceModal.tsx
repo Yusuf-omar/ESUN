@@ -87,89 +87,91 @@ export function ServiceModal({
             onClick={onClose}
             className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
           />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[#8c7656]/50 bg-[#100e0c]/95 p-6 shadow-[0_25px_60px_rgba(0,0,0,0.55)]"
-          >
-            <h2 className="text-xl font-bold text-white">
-              {m.title} {SERVICE_LABELS[serviceType]}
-            </h2>
-            {isSignedIn && (
-              <p className="mt-2 text-sm text-white/70">
-                {m.signedInHint}
-              </p>
-            )}
-            <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-              {!isSignedIn && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-white/80">
-                      {m.name}
-                    </label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      dir="auto"
-                      className="mt-1 w-full rounded-lg border border-[#8c7656]/50 bg-[#14110d]/75 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#c9ad84] focus:ring-2 focus:ring-[#c9ad84]/25 focus:outline-none"
-                      placeholder={m.namePlaceholder}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-white/80">
-                      {m.studentId}
-                    </label>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={studentId}
-                      onChange={(e) =>
-                        setStudentId(e.target.value.replace(/\D/g, "").slice(0, 11))
-                      }
-                      dir="ltr"
-                      className="mt-1 w-full rounded-lg border border-[#8c7656]/50 bg-[#14110d]/75 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#c9ad84] focus:ring-2 focus:ring-[#c9ad84]/25 focus:outline-none"
-                      placeholder={m.studentIdPlaceholder}
-                    />
-                  </div>
-                </>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#8c7656]/50 bg-[#100e0c]/95 p-5 shadow-[0_25px_60px_rgba(0,0,0,0.55)] md:p-6"
+            >
+              <h2 className="text-lg font-bold text-white md:text-xl">
+                {m.title} {SERVICE_LABELS[serviceType]}
+              </h2>
+              {isSignedIn && (
+                <p className="mt-2 text-sm text-white/70">
+                  {m.signedInHint}
+                </p>
               )}
-              <div>
-                <label className="block text-sm font-medium text-white/80">
-                  {m.issue}
-                </label>
-                <textarea
-                  value={issue}
-                  onChange={(e) => setIssue(e.target.value)}
-                  rows={4}
-                  dir="auto"
-                  className="mt-1 w-full resize-none rounded-lg border border-[#8c7656]/50 bg-[#14110d]/75 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#c9ad84] focus:ring-2 focus:ring-[#c9ad84]/25 focus:outline-none"
-                  placeholder={m.issuePlaceholder}
-                />
-              </div>
-              {error && (
-                <p className="text-sm text-red-400">{error}</p>
-              )}
-              <div className="flex gap-3">
-                <TapButton
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={onClose}
-                >
-                  {m.cancel}
-                </TapButton>
-                <TapButton
-                  type="submit"
-                  className="flex-1"
-                  disabled={loading}
-                >
-                  {loading ? m.submitting : m.submit}
-                </TapButton>
-              </div>
-            </form>
-          </motion.div>
+              <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+                {!isSignedIn && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-white/80">
+                        {m.name}
+                      </label>
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        dir="auto"
+                        className="mt-1 w-full rounded-lg border border-[#8c7656]/50 bg-[#14110d]/75 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#c9ad84] focus:ring-2 focus:ring-[#c9ad84]/25 focus:outline-none"
+                        placeholder={m.namePlaceholder}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white/80">
+                        {m.studentId}
+                      </label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={studentId}
+                        onChange={(e) =>
+                          setStudentId(e.target.value.replace(/\D/g, "").slice(0, 11))
+                        }
+                        dir="ltr"
+                        className="mt-1 w-full rounded-lg border border-[#8c7656]/50 bg-[#14110d]/75 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#c9ad84] focus:ring-2 focus:ring-[#c9ad84]/25 focus:outline-none"
+                        placeholder={m.studentIdPlaceholder}
+                      />
+                    </div>
+                  </>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-white/80">
+                    {m.issue}
+                  </label>
+                  <textarea
+                    value={issue}
+                    onChange={(e) => setIssue(e.target.value)}
+                    rows={4}
+                    dir="auto"
+                    className="mt-1 w-full resize-none rounded-lg border border-[#8c7656]/50 bg-[#14110d]/75 px-4 py-2 text-white placeholder:text-white/40 focus:border-[#c9ad84] focus:ring-2 focus:ring-[#c9ad84]/25 focus:outline-none"
+                    placeholder={m.issuePlaceholder}
+                  />
+                </div>
+                {error && (
+                  <p className="text-sm text-red-400">{error}</p>
+                )}
+                <div className="flex flex-col-reverse gap-3 sm:flex-row">
+                  <TapButton
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={onClose}
+                  >
+                    {m.cancel}
+                  </TapButton>
+                  <TapButton
+                    type="submit"
+                    className="flex-1"
+                    disabled={loading}
+                  >
+                    {loading ? m.submitting : m.submit}
+                  </TapButton>
+                </div>
+              </form>
+            </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>
