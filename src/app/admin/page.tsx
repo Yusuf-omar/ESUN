@@ -21,9 +21,17 @@ export default async function AdminPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user || !ADMIN_EMAILS.includes(user.email?.toLowerCase() ?? "")) {
-    redirect("/dashboard");
-  }
+  if (!user) redirect("/dashboard");
+
+const { data: profile } = await supabase
+  .from("profiles")
+  .select("role")
+  .eq("id", user.id)
+  .single();
+
+if (profile?.role !== "admin") {
+  redirect("/dashboard");
+}
 
   const admin = createAdminClient();
   const today = new Date().toISOString().slice(0, 10);
@@ -37,9 +45,9 @@ export default async function AdminPage() {
     admin.from("applications").select("*", { count: "exact", head: true }),
     admin.from("contact_messages").select("*", { count: "exact", head: true }),
     admin.from("profiles").select("*", { count: "exact", head: true }),
-    admin
+   admin
       .from("events")
-      .select("*", { count: "exact", head: true })
+      .select("id", { count: "exact" })
       .gte("date", today),
   ]);
 
