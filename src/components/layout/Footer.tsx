@@ -1,9 +1,6 @@
 import Link from "next/link";
 
-const INSTAGRAM_URL =
-  "https://www.instagram.com/esu.nisantasi?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==";
-const WHATSAPP_URL = "https://wa.me/905073449445";
-const EMAIL = "nisantasiegyptin@gmail.com";
+const INSTAGRAM_URL = "https://www.instagram.com/esu.nisantasi/";
 
 function InstagramIcon() {
   return (
@@ -45,20 +42,18 @@ export function Footer() {
             <span>Instagram</span>
           </Link>
           <Link
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/#contact"
             className="inline-flex items-center gap-2 rounded-lg border border-[#8c7656]/60 px-4 py-2 text-sm text-white hover:border-[#a81123] hover:text-[#a81123]"
           >
             <WhatsAppIcon />
-            <span>WhatsApp</span>
+            <span>WhatsApp Form</span>
           </Link>
           <Link
-            href={`mailto:${EMAIL}`}
+            href="/#contact"
             className="inline-flex items-center gap-2 rounded-lg border border-[#8c7656]/60 px-4 py-2 text-sm text-white hover:border-[#a81123] hover:text-[#a81123]"
           >
             <MailIcon />
-            <span>Email</span>
+            <span>Email Form</span>
           </Link>
         </div>
       </div>

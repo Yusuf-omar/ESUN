@@ -10,6 +10,7 @@ interface ContactProps {
     name: string;
     phone: string;
     message: string;
+    website?: string;
   }) => Promise<void>;
 }
 
@@ -17,6 +18,7 @@ export function Contact({ onSendMessage }: ContactProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
+  const [website, setWebsite] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const c = AR.contact;
@@ -26,11 +28,12 @@ export function Contact({ onSendMessage }: ContactProps) {
     setErrorMessage("");
     setStatus("sending");
     try {
-      await onSendMessage({ name, phone, message });
+      await onSendMessage({ name, phone, message, website });
       setStatus("sent");
       setName("");
       setPhone("");
       setMessage("");
+      setWebsite("");
     } catch (err) {
       const msg =
         err instanceof Error ? err.message : "Failed to send message.";
@@ -100,6 +103,17 @@ export function Contact({ onSendMessage }: ContactProps) {
                   required
                   rows={4}
                   className="mt-1 w-full resize-none rounded-lg border border-[#8c7656]/50 bg-[#14110d]/75 px-4 py-2 text-white focus:border-[#c9ad84] focus:ring-2 focus:ring-[#c9ad84]/25 focus:outline-none"
+                />
+              </div>
+              <div className="hidden" aria-hidden="true">
+                <label htmlFor="website">Website</label>
+                <input
+                  id="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
                 />
               </div>
               {status === "sent" && (

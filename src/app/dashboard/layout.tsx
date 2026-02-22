@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Nav } from "@/components/layout/Nav";
+import { isAllowedEmail } from "@/lib/security";
 
 export default async function DashboardLayout({
   children,
@@ -13,6 +14,7 @@ export default async function DashboardLayout({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+  if (!isAllowedEmail(user.email)) redirect("/login?error=domain");
 
   return (
     <>

@@ -2,10 +2,13 @@
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { isAllowedEmail } from "@/lib/security";
 import type { ServiceType } from "@/lib/types";
 
 const PHONE_REGEX = /^\+?\d{10,15}$/;
 const CONTACT_MIN_INTERVAL_MS = 60_000;
+const CONTACT_MAX_PER_HOUR = 5;
+const APPLICATION_MAX_PER_HOUR = 6;
 
 function normalizePhone(value: string) {
   const cleaned = value.replace(/[^\d+]/g, "");
@@ -47,6 +50,12 @@ export async function submitApplication(data: {
   if (!user) {
     throw new Error("Please sign in to submit an application.");
   }
+  if (!isAllowedEmail(user.email)) {
+    throw new Error("This account is not allowed to submit requests.");
+  }
+  if (!user.email_confirmed_at) {
+    throw new Error("Please verify your email before submitting a request.");
+  }
 
   const issue = data.issue.trim();
   if (!issue) {
@@ -80,6 +89,19 @@ export async function submitApplication(data: {
     throw new Error("Profile data is incomplete. Please update your name and student number.");
   }
 
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { count: recentCount, error: countError } = await supabase
+    .from("applications")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .gte("created_at", oneHourAgo);
+  if (countError) {
+    throw new Error("Could not validate request rate. Please try again.");
+  }
+  if ((recentCount ?? 0) >= APPLICATION_MAX_PER_HOUR) {
+    throw new Error("Too many requests. Please wait before submitting again.");
+  }
+
   const { error } = await supabase.from("applications").insert({
     user_id: user.id,
     service_type: data.serviceType,
@@ -93,10 +115,16 @@ export async function sendMessage(data: {
   name: string;
   phone: string;
   message: string;
+  website?: string;
 }) {
   const name = data.name.trim();
   const phone = normalizePhone(data.phone);
   const message = data.message.trim();
+  const website = data.website?.trim() ?? "";
+
+  if (website) {
+    throw new Error("Failed to send message.");
+  }
 
   if (!name || !message || !PHONE_REGEX.test(phone)) {
     throw new Error("Please provide a valid name, phone number, and message.");
@@ -104,7 +132,9 @@ export async function sendMessage(data: {
 
   const admin = createAdminClient();
   let recent: { created_at: string }[] | null = null;
+  let hourlyCount = 0;
   let useLegacySchema = false;
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
   const { data: recentByPhone, error: recentByPhoneError } = await admin
     .from("contact_messages")
@@ -129,8 +159,24 @@ export async function sendMessage(data: {
 
     if (recentByEmailError) throw new Error("Failed to send message.");
     recent = recentByEmail;
+
+    const { count: hourlyByEmail, error: hourlyByEmailError } = await admin
+      .from("contact_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("email", phone)
+      .gte("created_at", oneHourAgo);
+    if (hourlyByEmailError) throw new Error("Failed to send message.");
+    hourlyCount = hourlyByEmail ?? 0;
   } else {
     recent = recentByPhone;
+
+    const { count: hourlyByPhone, error: hourlyByPhoneError } = await admin
+      .from("contact_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("phone_number", phone)
+      .gte("created_at", oneHourAgo);
+    if (hourlyByPhoneError) throw new Error("Failed to send message.");
+    hourlyCount = hourlyByPhone ?? 0;
   }
 
   if (recent && recent.length > 0) {
@@ -138,6 +184,9 @@ export async function sendMessage(data: {
     if (Number.isFinite(last) && Date.now() - last < CONTACT_MIN_INTERVAL_MS) {
       throw new Error("Please wait one minute before sending another message.");
     }
+  }
+  if (hourlyCount >= CONTACT_MAX_PER_HOUR) {
+    throw new Error("Too many messages. Please try again in one hour.");
   }
 
   const { error: insertError } = await admin.from("contact_messages").insert({
