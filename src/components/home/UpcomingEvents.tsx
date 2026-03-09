@@ -6,7 +6,7 @@ import { TapButton } from "@/components/ui/TapButton";
 import type { EventRow } from "@/lib/types";
 import { getLocaleTag } from "@/lib/i18n";
 import { useI18n } from "@/components/providers/I18nProvider";
-import type { ContentLocale } from "@/lib/types";
+import { useAutoTranslate } from "@/hooks/useAutoTranslate";
 
 function formatDate(value: string, localeTag: string) {
   return new Date(value).toLocaleDateString(localeTag, {
@@ -19,7 +19,10 @@ function formatDate(value: string, localeTag: string) {
 export function UpcomingEvents({ events }: { events: EventRow[] }) {
   const { copy, locale } = useI18n();
   const localeTag = getLocaleTag(locale);
-  const visibleEvents = events.filter((event) => matchesLocale(event.content_locale, locale));
+  const translate = useAutoTranslate(
+    events.map((event) => event.title),
+    locale
+  );
 
   return (
     <section
@@ -34,13 +37,13 @@ export function UpcomingEvents({ events }: { events: EventRow[] }) {
           {copy.events.subtitle}
         </p>
 
-        {visibleEvents.length === 0 ? (
+        {events.length === 0 ? (
           <p className="mx-auto mt-10 max-w-2xl text-center text-white/65">
             {copy.events.empty}
           </p>
         ) : (
           <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {visibleEvents.map((event, index) => (
+            {events.map((event, index) => (
               <motion.article
                 key={event.id}
                 initial={{ opacity: 0, y: 18 }}
@@ -54,7 +57,9 @@ export function UpcomingEvents({ events }: { events: EventRow[] }) {
                 </div>
                 <div className="relative z-10">
                   <p className="text-sm text-[#8c7656]">{formatDate(event.date, localeTag)}</p>
-                  <h3 className="mt-2 text-xl font-bold text-white">{event.title}</h3>
+                  <h3 className="mt-2 text-xl font-bold text-white">
+                    {translate(event.title)}
+                  </h3>
                   <div className="mt-6">
                     {event.registration_link ? (
                       <Link href={event.registration_link} target="_blank" rel="noopener noreferrer">
@@ -74,15 +79,4 @@ export function UpcomingEvents({ events }: { events: EventRow[] }) {
       </div>
     </section>
   );
-}
-
-function matchesLocale(
-  value: ContentLocale | null | undefined,
-  locale: "ar" | "en" | "tr"
-) {
-  const normalized: ContentLocale = value ?? "ar";
-  if (normalized === "all") {
-    return locale === "ar";
-  }
-  return normalized === locale;
 }

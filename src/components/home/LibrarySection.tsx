@@ -6,7 +6,7 @@ import type { LibraryItem } from "@/lib/types";
 import { TapButton } from "@/components/ui/TapButton";
 import { getLocaleTag } from "@/lib/i18n";
 import { useI18n } from "@/components/providers/I18nProvider";
-import type { ContentLocale } from "@/lib/types";
+import { useAutoTranslate } from "@/hooks/useAutoTranslate";
 
 function formatDate(value: string, localeTag: string) {
   return new Date(value).toLocaleDateString(localeTag, {
@@ -28,7 +28,10 @@ export function LibrarySection({ items }: { items: LibraryItem[] }) {
   const { copy, locale } = useI18n();
   const library = copy.library;
   const localeTag = getLocaleTag(locale);
-  const visibleItems = items.filter((item) => matchesLocale(item.content_locale, locale));
+  const translate = useAutoTranslate(
+    items.flatMap((item) => [item.title, item.category, item.description]),
+    locale
+  );
 
   return (
     <section
@@ -40,7 +43,7 @@ export function LibrarySection({ items }: { items: LibraryItem[] }) {
           {library.title}
         </h2>
 
-        {visibleItems.length === 0 ? (
+        {items.length === 0 ? (
           <p className="mx-auto mt-10 max-w-2xl text-center text-white/70">
             {library.noPosts}
           </p>
@@ -51,7 +54,7 @@ export function LibrarySection({ items }: { items: LibraryItem[] }) {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
           >
-            {visibleItems.map((item, index) => {
+            {items.map((item, index) => {
               const postUrl = getPostUrl(item);
               const previewImageUrl = getPreviewImageUrl(item);
               return (
@@ -65,14 +68,16 @@ export function LibrarySection({ items }: { items: LibraryItem[] }) {
                 >
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <span className="rounded-full border border-[#8c7656]/50 px-3 py-1 text-xs text-[#8c7656]">
-                      {item.category || library.generalCategory}
+                      {translate(item.category) || library.generalCategory}
                     </span>
                     <span className="text-xs text-white/50">
                       {formatDate(item.created_at, localeTag)}
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-white">{item.title}</h3>
+                  <h3 className="text-lg font-bold text-white">
+                    {translate(item.title)}
+                  </h3>
                   {previewImageUrl && (
                     <img
                       src={previewImageUrl}
@@ -86,7 +91,7 @@ export function LibrarySection({ items }: { items: LibraryItem[] }) {
                   )}
 
                   <p className="mt-3 flex-1 text-sm leading-7 text-white/80">
-                    {item.description || library.noDescription}
+                    {translate(item.description) || library.noDescription}
                   </p>
 
                   <div className="mt-5">
@@ -108,15 +113,4 @@ export function LibrarySection({ items }: { items: LibraryItem[] }) {
       </div>
     </section>
   );
-}
-
-function matchesLocale(
-  value: ContentLocale | null | undefined,
-  locale: "ar" | "en" | "tr"
-) {
-  const normalized: ContentLocale = value ?? "ar";
-  if (normalized === "all") {
-    return locale === "ar";
-  }
-  return normalized === locale;
 }
