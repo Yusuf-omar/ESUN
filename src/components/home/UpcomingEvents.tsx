@@ -6,6 +6,7 @@ import { TapButton } from "@/components/ui/TapButton";
 import type { EventRow } from "@/lib/types";
 import { getLocaleTag } from "@/lib/i18n";
 import { useI18n } from "@/components/providers/I18nProvider";
+import type { ContentLocale } from "@/lib/types";
 
 function formatDate(value: string, localeTag: string) {
   return new Date(value).toLocaleDateString(localeTag, {
@@ -18,6 +19,7 @@ function formatDate(value: string, localeTag: string) {
 export function UpcomingEvents({ events }: { events: EventRow[] }) {
   const { copy, locale } = useI18n();
   const localeTag = getLocaleTag(locale);
+  const visibleEvents = events.filter((event) => matchesLocale(event.content_locale, locale));
 
   return (
     <section
@@ -32,13 +34,13 @@ export function UpcomingEvents({ events }: { events: EventRow[] }) {
           {copy.events.subtitle}
         </p>
 
-        {events.length === 0 ? (
+        {visibleEvents.length === 0 ? (
           <p className="mx-auto mt-10 max-w-2xl text-center text-white/65">
             {copy.events.empty}
           </p>
         ) : (
           <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {events.map((event, index) => (
+            {visibleEvents.map((event, index) => (
               <motion.article
                 key={event.id}
                 initial={{ opacity: 0, y: 18 }}
@@ -74,3 +76,13 @@ export function UpcomingEvents({ events }: { events: EventRow[] }) {
   );
 }
 
+function matchesLocale(
+  value: ContentLocale | null | undefined,
+  locale: "ar" | "en" | "tr"
+) {
+  const normalized: ContentLocale = value ?? "ar";
+  if (normalized === "all") {
+    return locale === "ar";
+  }
+  return normalized === locale;
+}

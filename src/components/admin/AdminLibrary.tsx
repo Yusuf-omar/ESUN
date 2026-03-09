@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TapButton } from "@/components/ui/TapButton";
+import type { ContentLocale } from "@/lib/types";
 import {
   createLibraryItem,
   deleteLibraryItem,
@@ -10,9 +11,16 @@ import {
   updateLibraryItem,
 } from "@/app/admin/actions";
 
+const CONTENT_LOCALE_OPTIONS: Array<{ value: ContentLocale; label: string }> = [
+  { value: "ar", label: "Arabic" },
+  { value: "en", label: "English" },
+  { value: "tr", label: "Turkish" },
+];
+
 interface LibraryRow {
   id: string;
   title: string;
+  content_locale?: ContentLocale | null;
   category: string | null;
   description: string | null;
   file_url: string | null;
@@ -24,6 +32,7 @@ interface LibraryRow {
 
 interface EditFormState {
   title: string;
+  contentLocale: ContentLocale;
   category: string;
   description: string;
   postUrl: string;
@@ -50,6 +59,7 @@ function resolvePreviewImage(item: LibraryRow) {
 function toEditState(item: LibraryRow): EditFormState {
   return {
     title: item.title,
+    contentLocale: item.content_locale ?? "ar",
     category: item.category || "",
     description: item.description || "",
     postUrl: resolvePostUrl(item),
@@ -61,6 +71,7 @@ function toEditState(item: LibraryRow): EditFormState {
 export function AdminLibrary({ list }: { list: LibraryRow[] }) {
   const router = useRouter();
   const [title, setTitle] = useState("");
+  const [contentLocale, setContentLocale] = useState<ContentLocale>("ar");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [postUrl, setPostUrl] = useState("");
@@ -71,6 +82,7 @@ export function AdminLibrary({ list }: { list: LibraryRow[] }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<EditFormState>({
     title: "",
+    contentLocale: "ar",
     category: "",
     description: "",
     postUrl: "",
@@ -86,6 +98,7 @@ export function AdminLibrary({ list }: { list: LibraryRow[] }) {
     try {
       await createLibraryItem({
         title,
+        contentLocale,
         category,
         description,
         postUrl,
@@ -93,6 +106,7 @@ export function AdminLibrary({ list }: { list: LibraryRow[] }) {
         isPublic,
       });
       setTitle("");
+      setContentLocale("ar");
       setCategory("");
       setDescription("");
       setPostUrl("");
@@ -146,6 +160,7 @@ export function AdminLibrary({ list }: { list: LibraryRow[] }) {
     try {
       await updateLibraryItem(id, {
         title: editForm.title,
+        contentLocale: editForm.contentLocale,
         category: editForm.category,
         description: editForm.description,
         postUrl: editForm.postUrl,
@@ -178,6 +193,23 @@ export function AdminLibrary({ list }: { list: LibraryRow[] }) {
               className="mt-1 w-full rounded-lg border border-[#8c7656]/50 bg-[#010101] px-4 py-2 text-white focus:border-[#a81123] focus:outline-none"
               required
             />
+          </div>
+          <div>
+            <label className="text-sm text-white/75">Content Language</label>
+            <select
+              value={contentLocale}
+              onChange={(e) => setContentLocale(e.target.value as ContentLocale)}
+              className="mt-1 w-full rounded-lg border border-[#8c7656]/50 bg-[#010101] px-4 py-2 text-white focus:border-[#a81123] focus:outline-none"
+            >
+              {CONTENT_LOCALE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-white/55">
+              Add separate cards per language to keep content translated correctly.
+            </p>
           </div>
           <div>
             <label className="text-sm text-white/75">Category</label>
@@ -266,6 +298,25 @@ export function AdminLibrary({ list }: { list: LibraryRow[] }) {
                       />
                     </div>
                     <div>
+                      <label className="text-sm text-white/75">Content Language</label>
+                      <select
+                        value={editForm.contentLocale}
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
+                            ...prev,
+                            contentLocale: e.target.value as ContentLocale,
+                          }))
+                        }
+                        className="mt-1 w-full rounded-lg border border-[#8c7656]/50 bg-[#010101] px-4 py-2 text-white focus:border-[#a81123] focus:outline-none"
+                      >
+                        {CONTENT_LOCALE_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
                       <label className="text-sm text-white/75">Category</label>
                       <input
                         value={editForm.category}
@@ -349,6 +400,9 @@ export function AdminLibrary({ list }: { list: LibraryRow[] }) {
                       <h3 className="font-medium text-white">{item.title}</h3>
                       <p className="text-xs text-white/50">{formatDate(item.created_at)}</p>
                     </div>
+                    <p className="mt-1 text-xs text-white/60">
+                      Locale: {item.content_locale ?? "ar"}
+                    </p>
                     <p className="mt-1 text-sm text-white/70">{item.category || "General"}</p>
                     {previewImage && (
                       <img

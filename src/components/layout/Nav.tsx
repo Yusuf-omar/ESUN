@@ -107,8 +107,8 @@ export function Nav() {
           </button>
         </div>
 
-        <div className="mt-3 hidden items-center justify-between gap-4 md:flex">
-          <ul className="flex flex-wrap items-center gap-5">
+        <div className="mt-3 hidden flex-wrap items-center justify-between gap-4 md:flex">
+          <ul className="flex min-w-0 flex-1 flex-wrap items-center gap-5">
             {navItems.map((item) => (
               <li key={item.href}>
                 <Link
@@ -121,7 +121,7 @@ export function Nav() {
             ))}
           </ul>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <LanguageSwitcher compact />
             {user === true ? (
               <>

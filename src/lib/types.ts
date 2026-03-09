@@ -3,6 +3,8 @@ export type ServiceType =
   | "cultural_activities"
   | "religious_social_guidance";
 
+export type ContentLocale = "ar" | "en" | "tr" | "all";
+
 export type ApplicationStatus = "pending" | "in_progress" | "resolved";
 
 export interface Application {
@@ -17,6 +19,7 @@ export interface Application {
 export interface EventRow {
   id: string;
   title: string;
+  content_locale?: ContentLocale | null;
   date: string;
   registration_link: string | null;
 }
@@ -24,6 +27,7 @@ export interface EventRow {
 export interface LibraryItem {
   id: string;
   title: string;
+  content_locale?: ContentLocale | null;
   category: string | null;
   description: string | null;
   file_url: string | null;

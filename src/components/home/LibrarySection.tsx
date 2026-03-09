@@ -6,6 +6,7 @@ import type { LibraryItem } from "@/lib/types";
 import { TapButton } from "@/components/ui/TapButton";
 import { getLocaleTag } from "@/lib/i18n";
 import { useI18n } from "@/components/providers/I18nProvider";
+import type { ContentLocale } from "@/lib/types";
 
 function formatDate(value: string, localeTag: string) {
   return new Date(value).toLocaleDateString(localeTag, {
@@ -27,6 +28,7 @@ export function LibrarySection({ items }: { items: LibraryItem[] }) {
   const { copy, locale } = useI18n();
   const library = copy.library;
   const localeTag = getLocaleTag(locale);
+  const visibleItems = items.filter((item) => matchesLocale(item.content_locale, locale));
 
   return (
     <section
@@ -38,7 +40,7 @@ export function LibrarySection({ items }: { items: LibraryItem[] }) {
           {library.title}
         </h2>
 
-        {items.length === 0 ? (
+        {visibleItems.length === 0 ? (
           <p className="mx-auto mt-10 max-w-2xl text-center text-white/70">
             {library.noPosts}
           </p>
@@ -49,7 +51,7 @@ export function LibrarySection({ items }: { items: LibraryItem[] }) {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
           >
-            {items.map((item, index) => {
+            {visibleItems.map((item, index) => {
               const postUrl = getPostUrl(item);
               const previewImageUrl = getPreviewImageUrl(item);
               return (
@@ -106,4 +108,15 @@ export function LibrarySection({ items }: { items: LibraryItem[] }) {
       </div>
     </section>
   );
+}
+
+function matchesLocale(
+  value: ContentLocale | null | undefined,
+  locale: "ar" | "en" | "tr"
+) {
+  const normalized: ContentLocale = value ?? "ar";
+  if (normalized === "all") {
+    return locale === "ar";
+  }
+  return normalized === locale;
 }

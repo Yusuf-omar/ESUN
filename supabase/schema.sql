@@ -38,15 +38,21 @@ create table if not exists public.applications (
 create table if not exists public.events (
   id uuid primary key default gen_random_uuid(),
   title text not null,
+  content_locale text not null default 'ar' check (content_locale in ('ar', 'en', 'tr', 'all')),
   date date not null,
   registration_link text,
   created_at timestamptz default now()
 );
+alter table public.events add column if not exists content_locale text;
+update public.events set content_locale = 'ar' where content_locale is null;
+alter table public.events alter column content_locale set default 'ar';
+alter table public.events alter column content_locale set not null;
 
 -- Library resources
 create table if not exists public.library_items (
   id uuid primary key default gen_random_uuid(),
   title text not null,
+  content_locale text not null default 'ar' check (content_locale in ('ar', 'en', 'tr', 'all')),
   author text,
   category text,
   description text,
@@ -58,6 +64,10 @@ create table if not exists public.library_items (
 );
 alter table public.library_items add column if not exists post_url text;
 alter table public.library_items add column if not exists preview_image_url text;
+alter table public.library_items add column if not exists content_locale text;
+update public.library_items set content_locale = 'ar' where content_locale is null;
+alter table public.library_items alter column content_locale set default 'ar';
+alter table public.library_items alter column content_locale set not null;
 
 -- Backfill legacy data: old file_url becomes post_url if post_url is empty.
 update public.library_items

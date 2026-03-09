@@ -19,10 +19,24 @@ export default async function AdminLibraryPage() {
   }
 
   const admin = createAdminClient();
-  const { data: items, error } = await admin
+  const { data: itemsWithLocale, error: withLocaleError } = await admin
     .from("library_items")
-    .select("id, title, category, description, file_url, post_url, preview_image_url, is_public, created_at")
+    .select("id, title, content_locale, category, description, file_url, post_url, preview_image_url, is_public, created_at")
     .order("created_at", { ascending: false });
+
+  const { data: legacyItems, error: legacyError } =
+    withLocaleError &&
+    withLocaleError.message.toLowerCase().includes("content_locale")
+      ? await admin
+          .from("library_items")
+          .select("id, title, category, description, file_url, post_url, preview_image_url, is_public, created_at")
+          .order("created_at", { ascending: false })
+      : { data: null as { id: string }[] | null, error: withLocaleError };
+
+  const items = itemsWithLocale ?? legacyItems ?? [];
+  const error = withLocaleError && !withLocaleError.message.toLowerCase().includes("content_locale")
+    ? withLocaleError
+    : legacyError;
 
   return (
     <div>
@@ -33,7 +47,7 @@ export default async function AdminLibraryPage() {
           {error.message}
         </p>
       )}
-      <AdminLibrary list={items ?? []} />
+      <AdminLibrary list={items as Parameters<typeof AdminLibrary>[0]["list"]} />
     </div>
   );
 }
