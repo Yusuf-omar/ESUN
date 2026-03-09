@@ -1,4 +1,4 @@
-import type { ServiceType } from "@/lib/types";
+﻿import type { ServiceType } from "@/lib/types";
 import { AR } from "@/lib/ar";
 
 export type Locale = "ar" | "en" | "tr";
@@ -12,61 +12,61 @@ const ar = {
   ...AR,
   nav: {
     ...AR.nav,
-    events: "الفعاليات",
+    events: "Ø§Ù„ÙØ¹Ø§Ù„ÙŠØ§Øª",
   },
   serviceModal: {
     ...AR.serviceModal,
-    genericError: "حدث خطأ ما.",
+    genericError: "Ø­Ø¯Ø« Ø®Ø·Ø£ Ù…Ø§.",
   },
   community: {
     ...AR.community,
     teaser:
-      "يمكن تضمين خلاصة إنستغرام هنا أو مزامنتها عبر API. حالياً، زر حسابنا للأحدث.",
+      "ÙŠÙ…ÙƒÙ† ØªØ¶Ù…ÙŠÙ† Ø®Ù„Ø§ØµØ© Ø¥Ù†Ø³ØªØºØ±Ø§Ù… Ù‡Ù†Ø§ Ø£Ùˆ Ù…Ø²Ø§Ù…Ù†ØªÙ‡Ø§ Ø¹Ø¨Ø± API. Ø­Ø§Ù„ÙŠØ§Ù‹ØŒ Ø²Ø± Ø­Ø³Ø§Ø¨Ù†Ø§ Ù„Ù„Ø£Ø­Ø¯Ø«.",
   },
   contact: {
     ...AR.contact,
     signedInHint:
-      "أنت مسجل دخول. سنستخدم اسمك ورقم هاتفك من ملفك الشخصي تلقائياً.",
-    useProfile: "اكتب رسالتك فقط وسنتولى بقية البيانات.",
+      "Ø£Ù†Øª Ù…Ø³Ø¬Ù„ Ø¯Ø®ÙˆÙ„. Ø³Ù†Ø³ØªØ®Ø¯Ù… Ø§Ø³Ù…Ùƒ ÙˆØ±Ù‚Ù… Ù‡Ø§ØªÙÙƒ Ù…Ù† Ù…Ù„ÙÙƒ Ø§Ù„Ø´Ø®ØµÙŠ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹.",
+    useProfile: "Ø§ÙƒØªØ¨ Ø±Ø³Ø§Ù„ØªÙƒ ÙÙ‚Ø· ÙˆØ³Ù†ØªÙˆÙ„Ù‰ Ø¨Ù‚ÙŠØ© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª.",
   },
   gpa: {
     ...AR.gpa,
-    backHome: "← الرئيسية",
+    backHome: "â† Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©",
   },
   dashboard: {
     ...AR.dashboard,
-    pageTitle: "ملفي الشخصي",
-    backHome: "← الرئيسية",
-    unionSubtitle: "اتحاد الطلاب المصريين · جامعة نيشان تاشي",
+    pageTitle: "Ù…Ù„ÙÙŠ Ø§Ù„Ø´Ø®ØµÙŠ",
+    backHome: "â† Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©",
+    unionSubtitle: "Ø§ØªØ­Ø§Ø¯ Ø§Ù„Ø·Ù„Ø§Ø¨ Ø§Ù„Ù…ØµØ±ÙŠÙŠÙ† Â· Ø¬Ø§Ù…Ø¹Ø© Ù†ÙŠØ´Ø§Ù† ØªØ§Ø´ÙŠ",
   },
   events: {
-    title: "الفعاليات القادمة",
-    subtitle: "شارك في فعاليات الاتحاد القادمة واحجز مقعدك مبكراً.",
-    empty: "لا توجد فعاليات قادمة حالياً.",
-    registerNow: "سجل الآن",
-    comingSoon: "قريباً",
+    title: "Ø§Ù„ÙØ¹Ø§Ù„ÙŠØ§Øª Ø§Ù„Ù‚Ø§Ø¯Ù…Ø©",
+    subtitle: "Ø´Ø§Ø±Ùƒ ÙÙŠ ÙØ¹Ø§Ù„ÙŠØ§Øª Ø§Ù„Ø§ØªØ­Ø§Ø¯ Ø§Ù„Ù‚Ø§Ø¯Ù…Ø© ÙˆØ§Ø­Ø¬Ø² Ù…Ù‚Ø¹Ø¯Ùƒ Ù…Ø¨ÙƒØ±Ø§Ù‹.",
+    empty: "Ù„Ø§ ØªÙˆØ¬Ø¯ ÙØ¹Ø§Ù„ÙŠØ§Øª Ù‚Ø§Ø¯Ù…Ø© Ø­Ø§Ù„ÙŠØ§Ù‹.",
+    registerNow: "Ø³Ø¬Ù„ Ø§Ù„Ø¢Ù†",
+    comingSoon: "Ù‚Ø±ÙŠØ¨Ø§Ù‹",
   },
   footer: {
-    title: "تواصل معنا",
+    title: "ØªÙˆØ§ØµÙ„ Ù…Ø¹Ù†Ø§",
     instagram: "Instagram",
     whatsapp: "WhatsApp",
-    emailForm: "نموذج التواصل",
-    whatsappPrefill: "مرحباً، أود التواصل مع اتحاد الطلاب المصريين في نيشان تاشي.",
+    emailForm: "البريد الإلكتروني",
+    whatsappPrefill: "Ù…Ø±Ø­Ø¨Ø§Ù‹ØŒ Ø£ÙˆØ¯ Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹ Ø§ØªØ­Ø§Ø¯ Ø§Ù„Ø·Ù„Ø§Ø¨ Ø§Ù„Ù…ØµØ±ÙŠÙŠÙ† ÙÙŠ Ù†ÙŠØ´Ø§Ù† ØªØ§Ø´ÙŠ.",
   },
   language: {
-    label: "اللغة",
-    switchAria: "تغيير اللغة",
-    ar: "العربية",
+    label: "Ø§Ù„Ù„ØºØ©",
+    switchAria: "ØªØºÙŠÙŠØ± Ø§Ù„Ù„ØºØ©",
+    ar: "Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©",
     en: "English",
-    tr: "Türkçe",
+    tr: "TÃ¼rkÃ§e",
   },
   auth: {
     ...AR.auth,
-    domainError: "هذا النطاق البريدي غير مسموح للوصول للأعضاء.",
-    authFailed: "فشلت المصادقة. يرجى المحاولة مرة أخرى.",
-    invalidCredentials: "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
-    configError: "Supabase غير مهيأ. أضف القيم الصحيحة في .env.local.",
-    signupFailed: "فشل إنشاء الحساب. حاول مرة أخرى.",
+    domainError: "Ù‡Ø°Ø§ Ø§Ù„Ù†Ø·Ø§Ù‚ Ø§Ù„Ø¨Ø±ÙŠØ¯ÙŠ ØºÙŠØ± Ù…Ø³Ù…ÙˆØ­ Ù„Ù„ÙˆØµÙˆÙ„ Ù„Ù„Ø£Ø¹Ø¶Ø§Ø¡.",
+    authFailed: "ÙØ´Ù„Øª Ø§Ù„Ù…ØµØ§Ø¯Ù‚Ø©. ÙŠØ±Ø¬Ù‰ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.",
+    invalidCredentials: "Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ø£Ùˆ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± ØµØ­ÙŠØ­Ø©.",
+    configError: "Supabase ØºÙŠØ± Ù…Ù‡ÙŠØ£. Ø£Ø¶Ù Ø§Ù„Ù‚ÙŠÙ… Ø§Ù„ØµØ­ÙŠØ­Ø© ÙÙŠ .env.local.",
+    signupFailed: "ÙØ´Ù„ Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø­Ø³Ø§Ø¨. Ø­Ø§ÙˆÙ„ Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.",
   },
 } as const;
 
@@ -193,7 +193,7 @@ const en: AppCopy = {
     totalGPA: "Total GPA",
     totalCredits: "Total Credits",
     placeholderCourse: "Example: Mathematics",
-    backHome: "← Home",
+    backHome: "â† Home",
   },
   library: {
     title: "Library",
@@ -226,7 +226,7 @@ const en: AppCopy = {
     goToLogin: "Go to Login",
     alreadyHaveAccount: "Already have an account?",
     noAccount: "Don't have an account?",
-    backToHome: "← Back to Home",
+    backToHome: "â† Back to Home",
     emailError: "Please enter a valid email address.",
     studentIdError:
       "Student number must be exactly 11 digits (example: 20232022109).",
@@ -254,8 +254,8 @@ const en: AppCopy = {
     inProgress: "In Progress",
     resolved: "Resolved",
     pageTitle: "My Dashboard",
-    backHome: "← Home",
-    unionSubtitle: "Egyptian Students Union · Nisantasi University",
+    backHome: "â† Home",
+    unionSubtitle: "Egyptian Students Union Â· Nisantasi University",
   },
   admin: {
     title: "Union Admin",
@@ -275,7 +275,7 @@ const en: AppCopy = {
     title: "Contact Us",
     instagram: "Instagram",
     whatsapp: "WhatsApp",
-    emailForm: "Contact Form",
+    emailForm: "Email",
     whatsappPrefill:
       "Hello, I would like to contact the Egyptian Students Union at Nisantasi.",
   },
@@ -319,7 +319,7 @@ const tr: AppCopy = {
       "Her Misirli ogrencinin desteklendigini ve bagli oldugunu hissettigi guclu bir topluluk.",
     historyTitle: "Uc Yillik Yolculuk",
     historyShort:
-      "Birlik, Nisantasi Universitesindeki Misirli ogrenciler tarafindan uc yildan uzun sure once ozel bir birlik ihtiyaciyla kuruldu. O gunden beri tani nan bir yapıya donustu",
+      "Birlik, Nisantasi Universitesindeki Misirli ogrenciler tarafindan uc yildan uzun sure once ozel bir birlik ihtiyaciyla kuruldu. O gunden beri tani nan bir yapÄ±ya donustu",
     historyFull:
       "Birlik, Nisantasi Universitesindeki Misirli ogrenciler tarafindan uc yildan uzun sure once ozel bir birlik ihtiyaciyla kuruldu. O gunden beri akademik destek, kulturel etkinlikler ve dini-sosyal rehberlik sunan taninan bir yapiya donustu. Liderligimiz, uyelerin basari icin ihtiyac duydugu kaynaklara ulasmasi icin universite ve yerel topluluklarla yakin calisir. Her yil hizmet ve etkinliklerimizi genisletiyoruz.",
     readMore: "Devamini Oku",
@@ -399,7 +399,7 @@ const tr: AppCopy = {
     totalGPA: "Genel Ortalama",
     totalCredits: "Toplam Kredi",
     placeholderCourse: "Ornek: Matematik",
-    backHome: "← Ana Sayfa",
+    backHome: "â† Ana Sayfa",
   },
   library: {
     title: "Kutuphane",
@@ -432,7 +432,7 @@ const tr: AppCopy = {
     goToLogin: "Girise Git",
     alreadyHaveAccount: "Zaten hesabin var mi?",
     noAccount: "Hesabin yok mu?",
-    backToHome: "← Ana Sayfaya Don",
+    backToHome: "â† Ana Sayfaya Don",
     emailError: "Lutfen gecerli bir e-posta adresi girin.",
     studentIdError:
       "Ogrenci numarasi tam 11 hane olmali (ornek: 20232022109).",
@@ -460,8 +460,8 @@ const tr: AppCopy = {
     inProgress: "Islemde",
     resolved: "Cozuldu",
     pageTitle: "Panelim",
-    backHome: "← Ana Sayfa",
-    unionSubtitle: "Misirli Ogrenciler Birligi · Nisantasi Universitesi",
+    backHome: "â† Ana Sayfa",
+    unionSubtitle: "Misirli Ogrenciler Birligi Â· Nisantasi Universitesi",
   },
   admin: {
     title: "Birlik Yonetimi",
@@ -482,7 +482,7 @@ const tr: AppCopy = {
     title: "Bize Ulasin",
     instagram: "Instagram",
     whatsapp: "WhatsApp",
-    emailForm: "Iletisim Formu",
+    emailForm: "E-posta",
     whatsappPrefill:
       "Merhaba, Nisantasi Misirli Ogrenciler Birligi ile iletisime gecmek istiyorum.",
   },
