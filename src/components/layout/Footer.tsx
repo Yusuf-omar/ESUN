@@ -1,8 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
-import Link from "next/link";
 import { useI18n } from "@/components/providers/I18nProvider";
+
+const INSTAGRAM_URL = "https://www.instagram.com/esu.nisantasi/";
+const WHATSAPP_URL = "https://wa.me/905073449445";
+const EMAIL_ADDRESS = "nisantasiegyptin@gmail.com";
 
 function InstagramIcon() {
   return (
@@ -33,15 +36,13 @@ export function Footer() {
 
   const instagramUrl = useMemo(() => {
     const customUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL?.trim();
-    if (customUrl) return customUrl;
-    return `https://www.instagram.com/${copy.community.instagramHandle}/`;
-  }, [copy.community.instagramHandle]);
+    return customUrl || INSTAGRAM_URL;
+  }, []);
 
   const whatsappUrl = useMemo(() => {
     const customUrl = process.env.NEXT_PUBLIC_WHATSAPP_URL?.trim();
-    if (customUrl) return customUrl;
-    return `https://wa.me/?text=${encodeURIComponent(copy.footer.whatsappPrefill)}`;
-  }, [copy.footer.whatsappPrefill]);
+    return customUrl || WHATSAPP_URL;
+  }, []);
 
   return (
     <footer className="border-t border-[#8c7656]/30 bg-transparent py-10">
@@ -66,13 +67,13 @@ export function Footer() {
             <WhatsAppIcon />
             <span>{copy.footer.whatsapp}</span>
           </a>
-          <Link
-            href="/#contact"
+          <a
+            href={`mailto:${EMAIL_ADDRESS}`}
             className="inline-flex items-center gap-2 rounded-lg border border-[#8c7656]/60 px-4 py-2 text-sm text-white hover:border-[#a81123] hover:text-[#a81123]"
           >
             <MailIcon />
             <span>{copy.footer.emailForm}</span>
-          </Link>
+          </a>
         </div>
       </div>
     </footer>
