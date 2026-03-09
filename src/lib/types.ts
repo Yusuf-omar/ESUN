@@ -31,11 +31,3 @@ export interface LibraryItem {
   preview_image_url: string | null;
   created_at: string;
 }
-
-import { AR } from "./ar";
-
-export const SERVICE_LABELS: Record<ServiceType, string> = {
-  academic_support: AR.services.academicSupport,
-  cultural_activities: AR.services.culturalActivities,
-  religious_social_guidance: AR.services.religiousSocialGuidance,
-};

@@ -17,7 +17,7 @@
   --color-foreground: var(--foreground);
   --color-inferno: var(--inferno);
   --color-desert-ash: var(--desert-ash);
-  --font-sans: var(--font-arabic), Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-latin), Helvetica, Arial, sans-serif;
 }
 
 body {
@@ -28,8 +28,12 @@ body {
     linear-gradient(135deg, #0a0908 0%, #12100d 38%, #060606 74%, #0d0c0a 100%);
   background-attachment: fixed;
   color: var(--foreground);
-  font-family: var(--font-arabic), Helvetica, Arial, sans-serif;
+  font-family: var(--font-latin), Helvetica, Arial, sans-serif;
   font-weight: 400;
+}
+
+[dir="rtl"] body {
+  font-family: var(--font-arabic), Helvetica, Arial, sans-serif;
 }
 
 @media (max-width: 768px) {
@@ -66,8 +70,17 @@ body::before {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-arabic), Helvetica, Arial, sans-serif;
+  font-family: var(--font-latin), Helvetica, Arial, sans-serif;
   font-weight: 700;
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6 {
+  font-family: var(--font-arabic), Helvetica, Arial, sans-serif;
 }
 
 /* Glassmorphism base */
@@ -106,6 +119,10 @@ h1, h2, h3, h4, h5, h6 {
 .glass:hover::after {
   opacity: 1;
   animation: ambientShift 1.8s ease-in-out;
+}
+
+.glass-nav {
+  overflow: visible;
 }
 
 /* Student ID format hint */

@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { Nav } from "@/components/layout/Nav";
 import { GPACalculator } from "@/components/gpa/GPACalculator";
-import { AR } from "@/lib/ar";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 export default function GPAPage() {
+  const { copy } = useI18n();
+
   return (
     <>
       <Nav />
@@ -13,18 +15,15 @@ export default function GPAPage() {
         <div className="mx-auto max-w-2xl px-4 py-12 md:px-6">
           <div className="mb-4">
             <Link href="/" className="text-sm text-white/70 hover:text-white">
-              ← الرئيسية
+              {copy.gpa.backHome}
             </Link>
           </div>
-          <h1 className="text-3xl font-bold text-white md:text-4xl">
-            {AR.gpa.title}
-          </h1>
-          <p className="mt-2 text-white/80">
-            {AR.gpa.subtitle}
-          </p>
+          <h1 className="text-3xl font-bold text-white md:text-4xl">{copy.gpa.title}</h1>
+          <p className="mt-2 text-white/80">{copy.gpa.subtitle}</p>
           <GPACalculator />
         </div>
       </main>
     </>
   );
 }
+

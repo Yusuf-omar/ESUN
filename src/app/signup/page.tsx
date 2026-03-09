@@ -6,14 +6,11 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { hasPublicSupabaseConfig } from "@/lib/supabase/env";
 import { TapButton } from "@/components/ui/TapButton";
-import { AR } from "@/lib/ar";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const STUDENT_ID_REGEX = /^\d{11}$/;
 const PHONE_REGEX = /^\+?\d{10,15}$/;
-const SUPABASE_CONFIG_ERROR =
-  "Supabase is not configured. Add real values in .env.local.";
-const a = AR.auth;
 
 function normalizePhone(value: string) {
   const cleaned = value.replace(/[^\d+]/g, "");
@@ -34,6 +31,9 @@ function isSupabaseConfigError(message: string) {
 }
 
 export default function SignupPage() {
+  const { copy } = useI18n();
+  const a = copy.auth;
+
   const [name, setName] = useState("");
   const [studentNumber, setStudentNumber] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -51,6 +51,7 @@ export default function SignupPage() {
     const normalizedEmail = email.trim().toLowerCase();
     const normalizedStudentNumber = studentNumber.replace(/\s/g, "");
     const normalizedPhoneNumber = normalizePhone(phoneNumber);
+
     if (!EMAIL_REGEX.test(normalizedEmail)) {
       setError(a.emailError);
       return;
@@ -64,7 +65,7 @@ export default function SignupPage() {
       return;
     }
     if (!hasPublicSupabaseConfig()) {
-      setError(SUPABASE_CONFIG_ERROR);
+      setError(a.configError);
       return;
     }
 
@@ -86,7 +87,7 @@ export default function SignupPage() {
       if (err) {
         const msg = err.message || "";
         if (isSupabaseConfigError(msg)) {
-          setError(SUPABASE_CONFIG_ERROR);
+          setError(a.configError);
           return;
         }
         setError(msg);
@@ -101,9 +102,8 @@ export default function SignupPage() {
 
       setSent(true);
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : (err as { message?: string })?.message;
-      setError(msg || "Sign up failed. Please try again.");
+      const msg = err instanceof Error ? err.message : (err as { message?: string })?.message;
+      setError(msg || a.signupFailed);
     } finally {
       setLoading(false);
     }
@@ -132,9 +132,7 @@ export default function SignupPage() {
         <p className="mt-1 text-sm text-white/70">{a.signupSubtitle}</p>
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-white/80">
-              {a.fullName}
-            </label>
+            <label className="block text-sm font-medium text-white/80">{a.fullName}</label>
             <input
               type="text"
               value={name}
@@ -146,16 +144,12 @@ export default function SignupPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/80">
-              {a.studentNumber}
-            </label>
+            <label className="block text-sm font-medium text-white/80">{a.studentNumber}</label>
             <input
               type="text"
               inputMode="numeric"
               value={studentNumber}
-              onChange={(e) =>
-                setStudentNumber(e.target.value.replace(/\D/g, "").slice(0, 11))
-              }
+              onChange={(e) => setStudentNumber(e.target.value.replace(/\D/g, "").slice(0, 11))}
               placeholder="20232022109"
               dir="ltr"
               className="mt-1 w-full rounded-lg border border-[#8c7656]/50 bg-[#010101] px-4 py-2 text-white placeholder:text-white/40 focus:border-[#a81123] focus:outline-none"
@@ -163,9 +157,7 @@ export default function SignupPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/80">
-              {a.phoneNumber}
-            </label>
+            <label className="block text-sm font-medium text-white/80">{a.phoneNumber}</label>
             <input
               type="tel"
               value={phoneNumber}
@@ -191,9 +183,7 @@ export default function SignupPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/80">
-              {a.password}
-            </label>
+            <label className="block text-sm font-medium text-white/80">{a.password}</label>
             <input
               type="password"
               value={password}
@@ -213,7 +203,7 @@ export default function SignupPage() {
         <p className="mt-4 text-center text-sm text-white/70">
           {a.alreadyHaveAccount}{" "}
           <Link href="/login" className="font-medium text-[#a81123]">
-            {AR.nav.logIn}
+            {copy.nav.logIn}
           </Link>
         </p>
         <p className="mt-2 text-center">

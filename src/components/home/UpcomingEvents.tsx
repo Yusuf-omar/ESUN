@@ -4,9 +4,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { TapButton } from "@/components/ui/TapButton";
 import type { EventRow } from "@/lib/types";
+import { getLocaleTag } from "@/lib/i18n";
+import { useI18n } from "@/components/providers/I18nProvider";
 
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("ar-EG", {
+function formatDate(value: string, localeTag: string) {
+  return new Date(value).toLocaleDateString(localeTag, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -14,6 +16,9 @@ function formatDate(value: string) {
 }
 
 export function UpcomingEvents({ events }: { events: EventRow[] }) {
+  const { copy, locale } = useI18n();
+  const localeTag = getLocaleTag(locale);
+
   return (
     <section
       id="events"
@@ -21,15 +26,15 @@ export function UpcomingEvents({ events }: { events: EventRow[] }) {
     >
       <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
         <h2 className="text-center text-3xl font-bold text-white md:text-4xl">
-          الفعاليات القادمة
+          {copy.events.title}
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-center text-white/75">
-          شارك في فعاليات الاتحاد القادمة واحجز مقعدك مبكرا.
+          {copy.events.subtitle}
         </p>
 
         {events.length === 0 ? (
           <p className="mx-auto mt-10 max-w-2xl text-center text-white/65">
-            لا توجد فعاليات قادمة حاليا.
+            {copy.events.empty}
           </p>
         ) : (
           <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -46,16 +51,16 @@ export function UpcomingEvents({ events }: { events: EventRow[] }) {
                   <div className="absolute inset-0 bg-gradient-to-b from-[#a81123]/20 via-transparent to-transparent" />
                 </div>
                 <div className="relative z-10">
-                  <p className="text-sm text-[#8c7656]">{formatDate(event.date)}</p>
+                  <p className="text-sm text-[#8c7656]">{formatDate(event.date, localeTag)}</p>
                   <h3 className="mt-2 text-xl font-bold text-white">{event.title}</h3>
                   <div className="mt-6">
                     {event.registration_link ? (
                       <Link href={event.registration_link} target="_blank" rel="noopener noreferrer">
-                        <TapButton className="w-full py-3">سجل الآن</TapButton>
+                        <TapButton className="w-full py-3">{copy.events.registerNow}</TapButton>
                       </Link>
                     ) : (
                       <TapButton className="w-full py-3" disabled>
-                        قريبا
+                        {copy.events.comingSoon}
                       </TapButton>
                     )}
                   </div>
@@ -68,3 +73,4 @@ export function UpcomingEvents({ events }: { events: EventRow[] }) {
     </section>
   );
 }
+

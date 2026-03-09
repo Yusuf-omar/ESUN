@@ -2,11 +2,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "")
-  .split(",")
-  .map((e) => e.trim().toLowerCase())
-  .filter(Boolean);
-
 function StatCard({ title, value }: { title: string; value: number }) {
   return (
     <article className="rounded-xl border border-[#8c7656]/40 bg-[#0d0d0d]/85 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#c9ad84]/60">

@@ -1,5 +1,7 @@
-import { AR } from "@/lib/ar";
+"use client";
+
 import { deleteContactMessage } from "@/app/admin/actions";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 interface MessageRow {
   id: string;
@@ -19,7 +21,8 @@ function formatDate(s: string) {
 }
 
 export function AdminMessages({ list }: { list: MessageRow[] }) {
-  const label = AR.contact.phone;
+  const { copy } = useI18n();
+  const label = copy.contact.phone;
 
   return (
     <div className="mt-6 space-y-4">

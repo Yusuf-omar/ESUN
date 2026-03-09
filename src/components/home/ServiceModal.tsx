@@ -4,11 +4,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TapButton } from "@/components/ui/TapButton";
 import type { ServiceType } from "@/lib/types";
-import { SERVICE_LABELS } from "@/lib/types";
-import { AR } from "@/lib/ar";
+import { getServiceLabels } from "@/lib/i18n";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 const STUDENT_ID_REGEX = /^\d{11}$/;
-const m = AR.serviceModal;
 
 interface ServiceModalProps {
   isOpen: boolean;
@@ -30,6 +29,10 @@ export function ServiceModal({
   isSignedIn,
   onSubmit,
 }: ServiceModalProps) {
+  const { copy } = useI18n();
+  const m = copy.serviceModal;
+  const serviceLabels = getServiceLabels(copy);
+
   const [name, setName] = useState("");
   const [studentId, setStudentId] = useState("");
   const [issue, setIssue] = useState("");
@@ -68,9 +71,7 @@ export function ServiceModal({
       setIssue("");
       onClose();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "حدث خطأ ما."
-      );
+      setError(err instanceof Error ? err.message : m.genericError);
     } finally {
       setLoading(false);
     }
@@ -95,20 +96,14 @@ export function ServiceModal({
               className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#8c7656]/50 bg-[#100e0c]/95 p-5 shadow-[0_25px_60px_rgba(0,0,0,0.55)] md:p-6"
             >
               <h2 className="text-lg font-bold text-white md:text-xl">
-                {m.title} {SERVICE_LABELS[serviceType]}
+                {m.title} {serviceLabels[serviceType]}
               </h2>
-              {isSignedIn && (
-                <p className="mt-2 text-sm text-white/70">
-                  {m.signedInHint}
-                </p>
-              )}
+              {isSignedIn && <p className="mt-2 text-sm text-white/70">{m.signedInHint}</p>}
               <form onSubmit={handleSubmit} className="mt-4 space-y-4">
                 {!isSignedIn && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-white/80">
-                        {m.name}
-                      </label>
+                      <label className="block text-sm font-medium text-white/80">{m.name}</label>
                       <input
                         type="text"
                         value={name}
@@ -137,9 +132,7 @@ export function ServiceModal({
                   </>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-white/80">
-                    {m.issue}
-                  </label>
+                  <label className="block text-sm font-medium text-white/80">{m.issue}</label>
                   <textarea
                     value={issue}
                     onChange={(e) => setIssue(e.target.value)}
@@ -149,23 +142,12 @@ export function ServiceModal({
                     placeholder={m.issuePlaceholder}
                   />
                 </div>
-                {error && (
-                  <p className="text-sm text-red-400">{error}</p>
-                )}
+                {error && <p className="text-sm text-red-400">{error}</p>}
                 <div className="flex flex-col-reverse gap-3 sm:flex-row">
-                  <TapButton
-                    type="button"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={onClose}
-                  >
+                  <TapButton type="button" variant="outline" className="flex-1" onClick={onClose}>
                     {m.cancel}
                   </TapButton>
-                  <TapButton
-                    type="submit"
-                    className="flex-1"
-                    disabled={loading}
-                  >
+                  <TapButton type="submit" className="flex-1" disabled={loading}>
                     {loading ? m.submitting : m.submit}
                   </TapButton>
                 </div>
@@ -177,3 +159,4 @@ export function ServiceModal({
     </AnimatePresence>
   );
 }
+

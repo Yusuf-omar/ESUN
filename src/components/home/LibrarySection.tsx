@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { LibraryItem } from "@/lib/types";
-import { AR } from "@/lib/ar";
 import { TapButton } from "@/components/ui/TapButton";
+import { getLocaleTag } from "@/lib/i18n";
+import { useI18n } from "@/components/providers/I18nProvider";
 
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("en-GB", {
+function formatDate(value: string, localeTag: string) {
+  return new Date(value).toLocaleDateString(localeTag, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -23,7 +24,9 @@ function getPreviewImageUrl(item: LibraryItem) {
 }
 
 export function LibrarySection({ items }: { items: LibraryItem[] }) {
-  const library = AR.library;
+  const { copy, locale } = useI18n();
+  const library = copy.library;
+  const localeTag = getLocaleTag(locale);
 
   return (
     <section
@@ -63,7 +66,7 @@ export function LibrarySection({ items }: { items: LibraryItem[] }) {
                       {item.category || library.generalCategory}
                     </span>
                     <span className="text-xs text-white/50">
-                      {formatDate(item.created_at)}
+                      {formatDate(item.created_at, localeTag)}
                     </span>
                   </div>
 

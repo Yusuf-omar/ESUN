@@ -3,10 +3,11 @@
 import { motion } from "framer-motion";
 import { TapButton } from "@/components/ui/TapButton";
 import Link from "next/link";
-import { AR } from "@/lib/ar";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 export function JoinForm() {
-  const j = AR.joinForm;
+  const { copy } = useI18n();
+  const j = copy.joinForm;
   return (
     <section
       id="join-form"

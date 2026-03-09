@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { TapButton } from "@/components/ui/TapButton";
-import { SERVICE_LABELS } from "@/lib/types";
 import type { ServiceType } from "@/lib/types";
 import { updateApplicationStatus } from "@/app/admin/actions";
+import { getServiceLabels } from "@/lib/i18n";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 interface AppRow {
   id: string;
@@ -25,6 +26,8 @@ function formatDate(s: string) {
 }
 
 export function AdminApplications({ list }: { list: AppRow[] }) {
+  const { copy } = useI18n();
+  const serviceLabels = getServiceLabels(copy);
   const [statuses, setStatuses] = useState<Record<string, string>>(
     Object.fromEntries(list.map((a) => [a.id, a.status]))
   );
@@ -60,7 +63,7 @@ export function AdminApplications({ list }: { list: AppRow[] }) {
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="font-medium text-white">
-                {SERVICE_LABELS[app.service_type]}
+                {serviceLabels[app.service_type]}
               </span>
               <span className="text-sm text-white/50">
                 {formatDate(app.created_at)}

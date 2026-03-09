@@ -1,6 +1,6 @@
 "use client";
 
-import { AR } from "@/lib/ar";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 interface Profile {
   id: string;
@@ -12,7 +12,8 @@ interface Profile {
 }
 
 export function ProfileSection({ profile }: { profile: Profile | null }) {
-  const d = AR.dashboard;
+  const { copy } = useI18n();
+  const d = copy.dashboard;
 
   return (
     <section className="glass rounded-2xl border border-[#8c7656]/40 bg-[#0d0d0d]/80 p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#c9ad84]/60">

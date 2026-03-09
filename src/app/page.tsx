@@ -41,7 +41,7 @@ export default async function HomePage() {
         <ServiceHub onSubmitApplication={submitApplication} isSignedIn={!!user} />
         <UpcomingEvents events={upcomingEvents ?? []} />
         <LibrarySection items={items} />
-        <Contact onSendMessage={sendMessage} />
+        <Contact onSendMessage={sendMessage} isSignedIn={!!user} />
         {!user && <JoinForm />}
       </main>
       <Footer />

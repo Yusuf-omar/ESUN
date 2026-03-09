@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { HeroLogo } from "./HeroLogo";
-import { AR } from "@/lib/ar";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 function scrollToJoin() {
   document.getElementById("join-form")?.scrollIntoView({
@@ -11,6 +11,8 @@ function scrollToJoin() {
 }
 
 export function Hero() {
+  const { copy } = useI18n();
+
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-transparent">
       <motion.div
@@ -44,7 +46,7 @@ export function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            {AR.hero.title}
+            {copy.hero.title}
           </motion.h1>
           <motion.p
             className="mt-2 text-base text-white/80 sm:text-lg md:text-xl"
@@ -52,7 +54,7 @@ export function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            {AR.hero.subtitle}
+            {copy.hero.subtitle}
           </motion.p>
         </div>
         <motion.div
@@ -68,7 +70,7 @@ export function Hero() {
               boxShadow: "0 0 24px rgba(168, 17, 35, 0.5)",
             }}
           >
-            {AR.hero.cta}
+            {copy.hero.cta}
           </motion.button>
         </motion.div>
       </motion.div>

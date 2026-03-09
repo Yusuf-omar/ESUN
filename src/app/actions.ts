@@ -112,13 +112,49 @@ export async function submitApplication(data: {
 }
 
 export async function sendMessage(data: {
-  name: string;
-  phone: string;
+  name?: string;
+  phone?: string;
   message: string;
   website?: string;
 }) {
-  const name = data.name.trim();
-  const phone = normalizePhone(data.phone);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let name = data.name?.trim() ?? "";
+  let phoneSource = data.phone ?? "";
+
+  if (user) {
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("full_name, phone_number")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError) {
+      throw new Error("Could not read your profile information. Please try again.");
+    }
+
+    const meta = (user.user_metadata ?? {}) as {
+      full_name?: unknown;
+      phone_number?: unknown;
+    };
+
+    name = pickFirstNonEmpty(
+      profile?.full_name,
+      typeof meta.full_name === "string" ? meta.full_name : undefined,
+      name
+    );
+
+    phoneSource = pickFirstNonEmpty(
+      profile?.phone_number,
+      typeof meta.phone_number === "string" ? meta.phone_number : undefined,
+      phoneSource
+    );
+  }
+
+  const phone = normalizePhone(phoneSource);
   const message = data.message.trim();
   const website = data.website?.trim() ?? "";
 
@@ -127,6 +163,9 @@ export async function sendMessage(data: {
   }
 
   if (!name || !message || !PHONE_REGEX.test(phone)) {
+    if (user) {
+      throw new Error("Profile data is incomplete. Please update your name and phone number.");
+    }
     throw new Error("Please provide a valid name, phone number, and message.");
   }
 

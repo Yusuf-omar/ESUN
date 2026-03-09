@@ -6,12 +6,9 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { hasPublicSupabaseConfig } from "@/lib/supabase/env";
 import { TapButton } from "@/components/ui/TapButton";
-import { AR } from "@/lib/ar";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const SUPABASE_CONFIG_ERROR =
-  "Supabase is not configured. Add real values in .env.local.";
-const a = AR.auth;
 
 function isSupabaseConfigError(message: string) {
   const lower = message.toLowerCase();
@@ -24,6 +21,9 @@ function isSupabaseConfigError(message: string) {
 }
 
 export default function LoginPage() {
+  const { copy } = useI18n();
+  const a = copy.auth;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -34,11 +34,11 @@ export default function LoginPage() {
     const params = new URLSearchParams(window.location.search);
     const errorParam = params.get("error");
     if (errorParam === "domain") {
-      setError("This email domain is not allowed for member access.");
+      setError(a.domainError);
     } else if (errorParam === "auth") {
-      setError("Authentication failed. Please try logging in again.");
+      setError(a.authFailed);
     }
-  }, []);
+  }, [a.authFailed, a.domainError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +50,7 @@ export default function LoginPage() {
       return;
     }
     if (!hasPublicSupabaseConfig()) {
-      setError(SUPABASE_CONFIG_ERROR);
+      setError(a.configError);
       return;
     }
 
@@ -64,7 +64,7 @@ export default function LoginPage() {
       if (err) {
         const msg = err.message || "";
         if (isSupabaseConfigError(msg)) {
-          setError(SUPABASE_CONFIG_ERROR);
+          setError(a.configError);
           return;
         }
         setError(msg);
@@ -73,9 +73,8 @@ export default function LoginPage() {
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : (err as { message?: string })?.message;
-      setError(msg || "Invalid email or password.");
+      const msg = err instanceof Error ? err.message : (err as { message?: string })?.message;
+      setError(msg || a.invalidCredentials);
     } finally {
       setLoading(false);
     }
@@ -101,9 +100,7 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/80">
-              {a.password}
-            </label>
+            <label className="block text-sm font-medium text-white/80">{a.password}</label>
             <input
               type="password"
               value={password}

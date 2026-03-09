@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { TapButton } from "@/components/ui/TapButton";
-import { AR } from "@/lib/ar";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 interface CourseRow {
   id: string;
@@ -12,14 +12,17 @@ interface CourseRow {
   grade: string;
 }
 
-const GRADES = AR.grades;
-
-function getPoints(gradeValue: string): number {
-  const g = GRADES.find((x) => x.value === gradeValue);
+function getPoints(
+  gradeValue: string,
+  grades: ReadonlyArray<{ value: string; points: number }>
+): number {
+  const g = grades.find((x) => x.value === gradeValue);
   return g?.points ?? 0;
 }
 
 export function GPACalculator() {
+  const { copy } = useI18n();
+  const grades = copy.grades;
   const [courses, setCourses] = useState<CourseRow[]>([
     { id: "1", name: "", credits: 3, grade: "A" },
   ]);
@@ -49,7 +52,7 @@ export function GPACalculator() {
 
   const totalCredits = courses.reduce((sum, c) => sum + (c.credits || 0), 0);
   const weightedSum = courses.reduce(
-    (sum, c) => sum + (c.credits || 0) * getPoints(c.grade),
+    (sum, c) => sum + (c.credits || 0) * getPoints(c.grade, grades),
     0
   );
   const gpa = totalCredits > 0 ? weightedSum / totalCredits : 0;
@@ -68,20 +71,20 @@ export function GPACalculator() {
           >
             <div className="min-w-[120px] flex-1">
               <label className="block text-xs text-white/60">
-                {AR.gpa.courseName}
+                {copy.gpa.courseName}
               </label>
               <input
                 type="text"
                 value={course.name}
                 onChange={(e) => updateCourse(course.id, "name", e.target.value)}
-                placeholder={AR.gpa.placeholderCourse}
+                placeholder={copy.gpa.placeholderCourse}
                 dir="auto"
                 className="mt-1 w-full rounded border border-[#8c7656]/40 bg-[#0d0d0d] px-3 py-2 text-white placeholder:text-white/40"
               />
             </div>
             <div className="w-20">
               <label className="block text-xs text-white/60">
-                {AR.gpa.credits}
+                {copy.gpa.credits}
               </label>
               <input
                 type="number"
@@ -97,14 +100,14 @@ export function GPACalculator() {
             </div>
             <div className="w-24">
               <label className="block text-xs text-white/60">
-                {AR.gpa.grade}
+                {copy.gpa.grade}
               </label>
               <select
                 value={course.grade}
                 onChange={(e) => updateCourse(course.id, "grade", e.target.value)}
                 className="mt-1 w-full rounded border border-[#8c7656]/40 bg-[#0d0d0d] px-3 py-2 text-white"
               >
-                {GRADES.map((g) => (
+                {grades.map((g) => (
                   <option key={g.value} value={g.value}>
                     {g.label}
                   </option>
@@ -117,23 +120,23 @@ export function GPACalculator() {
               className="py-2 text-red-400"
               onClick={() => removeCourse(course.id)}
             >
-              {AR.gpa.remove}
+              {copy.gpa.remove}
             </TapButton>
           </div>
         ))}
       </div>
       <div className="mt-4 flex justify-between gap-4">
         <TapButton variant="outline" onClick={addCourse} className="py-2">
-          {AR.gpa.addCourse}
+          {copy.gpa.addCourse}
         </TapButton>
       </div>
       <div className="mt-8 flex flex-wrap gap-6 rounded-xl border border-[#8c7656]/40 bg-[#010101] p-6">
         <div>
-          <p className="text-sm text-white/60">{AR.gpa.totalCredits}</p>
+          <p className="text-sm text-white/60">{copy.gpa.totalCredits}</p>
           <p className="text-2xl font-bold text-white">{totalCredits}</p>
         </div>
         <div>
-          <p className="text-sm text-white/60">{AR.gpa.totalGPA}</p>
+          <p className="text-sm text-white/60">{copy.gpa.totalGPA}</p>
           <p className="text-2xl font-bold text-[#a81123]">
             {gpa.toFixed(2)}
           </p>

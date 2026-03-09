@@ -2,27 +2,31 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import { AR } from "@/lib/ar";
-
-const navItems = [
-  { href: "/#our-story", label: AR.nav.ourStory },
-  { href: "/#services", label: AR.nav.services },
-  { href: "/#events", label: "الفعاليات" },
-  { href: "/gpa", label: AR.nav.gpaCalculator },
-  { href: "/#library", label: AR.nav.library },
-  { href: "/#contact", label: AR.nav.contact },
-];
+import { useI18n } from "@/components/providers/I18nProvider";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 
 export function Nav() {
   const [user, setUser] = useState<boolean | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
   const supabase = useMemo(() => createClient(), []);
+  const { copy } = useI18n();
+
+  const navItems = useMemo(
+    () => [
+      { href: "/#our-story", label: copy.nav.ourStory },
+      { href: "/#services", label: copy.nav.services },
+      { href: "/#events", label: copy.nav.events },
+      { href: "/gpa", label: copy.nav.gpaCalculator },
+      { href: "/#library", label: copy.nav.library },
+      { href: "/#contact", label: copy.nav.contact },
+    ],
+    [copy]
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -50,10 +54,6 @@ export function Nav() {
     };
   }, [supabase]);
 
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setIsMenuOpen(false);
@@ -66,19 +66,19 @@ export function Nav() {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="fixed left-0 right-0 top-0 z-50 glass"
+      className="fixed left-0 right-0 top-0 z-50 glass glass-nav"
     >
       <nav className="mx-auto max-w-6xl px-4 py-3 md:px-6">
         <div className="flex items-center justify-between gap-3">
           <Link href="/" className="max-w-[220px] text-white">
             <span className="block text-xs font-bold leading-snug md:text-sm">
-              اتحاد الطلاب المصريين
+              {copy.siteName}
             </span>
             <span className="block text-[11px] text-white/70 md:hidden">
-              جامعة نيشانتاشي
+              {copy.siteSubtitle}
             </span>
             <span className="hidden text-xs text-white/70 md:block">
-              بجامعه نيشان تاشي
+              {copy.siteSubtitle}
             </span>
           </Link>
 
@@ -107,7 +107,7 @@ export function Nav() {
           </button>
         </div>
 
-        <div className="mt-3 hidden items-center justify-between gap-6 md:flex">
+        <div className="mt-3 hidden items-center justify-between gap-4 md:flex">
           <ul className="flex flex-wrap items-center gap-5">
             {navItems.map((item) => (
               <li key={item.href}>
@@ -122,6 +122,7 @@ export function Nav() {
           </ul>
 
           <div className="flex items-center gap-2">
+            <LanguageSwitcher compact />
             {user === true ? (
               <>
                 <Link href="/dashboard">
@@ -129,7 +130,7 @@ export function Nav() {
                     whileTap={{ scale: 0.97 }}
                     className="rounded-lg bg-[#a81123] px-4 py-2 text-sm font-bold text-white"
                   >
-                    ملفي الشخصي
+                    {copy.nav.dashboard}
                   </motion.span>
                 </Link>
                 <motion.button
@@ -138,7 +139,7 @@ export function Nav() {
                   onClick={handleLogout}
                   className="rounded-lg border border-[#8c7656] px-4 py-2 text-sm font-medium text-white transition hover:border-[#c9ad84] hover:text-[#f4e6cc]"
                 >
-                  {AR.nav.logOut}
+                  {copy.nav.logOut}
                 </motion.button>
               </>
             ) : user === false ? (
@@ -148,7 +149,7 @@ export function Nav() {
                     whileTap={{ scale: 0.97 }}
                     className="rounded-lg border border-[#8c7656] px-4 py-2 text-sm font-medium text-white transition hover:border-[#c9ad84] hover:text-[#f4e6cc]"
                   >
-                    {AR.nav.logIn}
+                    {copy.nav.logIn}
                   </motion.span>
                 </Link>
                 <Link href="/signup">
@@ -156,7 +157,7 @@ export function Nav() {
                     whileTap={{ scale: 0.97 }}
                     className="rounded-lg bg-[#a81123] px-4 py-2 text-sm font-bold text-white"
                   >
-                    {AR.nav.joinUnion}
+                    {copy.nav.joinUnion}
                   </motion.span>
                 </Link>
               </>
@@ -182,6 +183,7 @@ export function Nav() {
               ))}
             </ul>
             <div className="mt-3 space-y-2 border-t border-[#8c7656]/35 pt-3">
+              <LanguageSwitcher />
               {user === true ? (
                 <>
                   <Link
@@ -189,14 +191,14 @@ export function Nav() {
                     className="block rounded-lg bg-[#a81123] px-4 py-2.5 text-center text-sm font-bold text-white"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    ملفي الشخصي
+                    {copy.nav.dashboard}
                   </Link>
                   <button
                     type="button"
                     onClick={handleLogout}
                     className="w-full rounded-lg border border-[#8c7656] px-4 py-2.5 text-sm font-medium text-white transition hover:border-[#c9ad84] hover:text-[#f4e6cc]"
                   >
-                    {AR.nav.logOut}
+                    {copy.nav.logOut}
                   </button>
                 </>
               ) : user === false ? (
@@ -206,14 +208,14 @@ export function Nav() {
                     className="block rounded-lg border border-[#8c7656] px-4 py-2.5 text-center text-sm font-medium text-white transition hover:border-[#c9ad84] hover:text-[#f4e6cc]"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    {AR.nav.logIn}
+                    {copy.nav.logIn}
                   </Link>
                   <Link
                     href="/signup"
                     className="block rounded-lg bg-[#a81123] px-4 py-2.5 text-center text-sm font-bold text-white"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    {AR.nav.joinUnion}
+                    {copy.nav.joinUnion}
                   </Link>
                 </>
               ) : (

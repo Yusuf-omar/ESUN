@@ -1,6 +1,8 @@
-import Link from "next/link";
+"use client";
 
-const INSTAGRAM_URL = "https://www.instagram.com/esu.nisantasi/";
+import { useMemo } from "react";
+import Link from "next/link";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 function InstagramIcon() {
   return (
@@ -27,36 +29,53 @@ function MailIcon() {
 }
 
 export function Footer() {
+  const { copy } = useI18n();
+
+  const instagramUrl = useMemo(() => {
+    const customUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL?.trim();
+    if (customUrl) return customUrl;
+    return `https://www.instagram.com/${copy.community.instagramHandle}/`;
+  }, [copy.community.instagramHandle]);
+
+  const whatsappUrl = useMemo(() => {
+    const customUrl = process.env.NEXT_PUBLIC_WHATSAPP_URL?.trim();
+    if (customUrl) return customUrl;
+    return `https://wa.me/?text=${encodeURIComponent(copy.footer.whatsappPrefill)}`;
+  }, [copy.footer.whatsappPrefill]);
+
   return (
     <footer className="border-t border-[#8c7656]/30 bg-transparent py-10">
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-5 px-4 md:px-6">
-        <h3 className="text-xl font-bold text-white">تواصل معنا</h3>
+        <h3 className="text-xl font-bold text-white">{copy.footer.title}</h3>
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href={INSTAGRAM_URL}
+          <a
+            href={instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-lg border border-[#8c7656]/60 px-4 py-2 text-sm text-white hover:border-[#a81123] hover:text-[#a81123]"
           >
             <InstagramIcon />
-            <span>Instagram</span>
-          </Link>
-          <Link
-            href="/#contact"
+            <span>{copy.footer.instagram}</span>
+          </a>
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-lg border border-[#8c7656]/60 px-4 py-2 text-sm text-white hover:border-[#a81123] hover:text-[#a81123]"
           >
             <WhatsAppIcon />
-            <span>WhatsApp Form</span>
-          </Link>
+            <span>{copy.footer.whatsapp}</span>
+          </a>
           <Link
             href="/#contact"
             className="inline-flex items-center gap-2 rounded-lg border border-[#8c7656]/60 px-4 py-2 text-sm text-white hover:border-[#a81123] hover:text-[#a81123]"
           >
             <MailIcon />
-            <span>Email Form</span>
+            <span>{copy.footer.emailForm}</span>
           </Link>
         </div>
       </div>
     </footer>
   );
 }
+
