@@ -13,7 +13,12 @@ import type { EventRow, LibraryItem } from "@/lib/types";
 
 function isMissingColumnError(message: string, column: string) {
   const lower = message.toLowerCase();
-  return lower.includes(column) && lower.includes("does not exist");
+  return (
+    lower.includes(column) &&
+    (lower.includes("does not exist") ||
+      lower.includes("schema cache") ||
+      lower.includes("could not find"))
+  );
 }
 
 async function fetchUpcomingEvents(supabase: Awaited<ReturnType<typeof createClient>>, today: string) {
@@ -21,23 +26,9 @@ async function fetchUpcomingEvents(supabase: Awaited<ReturnType<typeof createCli
     () =>
       supabase
         .from("events")
-        .select("id, title, content_locale, date, registration_link")
-        .gte("date", today)
-        .order("date", { ascending: true })
-        .limit(20),
-    () =>
-      supabase
-        .from("events")
         .select("id, title, date, registration_link")
         .gte("date", today)
         .order("date", { ascending: true })
-        .limit(20),
-    () =>
-      supabase
-        .from("events")
-        .select("id, title, content_locale, date:event_date, registration_link")
-        .gte("event_date", today)
-        .order("event_date", { ascending: true })
         .limit(20),
     () =>
       supabase
@@ -54,7 +45,6 @@ async function fetchUpcomingEvents(supabase: Awaited<ReturnType<typeof createCli
 
     const message = error.message ?? "";
     const isSchemaMismatch =
-      isMissingColumnError(message, "content_locale") ||
       isMissingColumnError(message, "date") ||
       isMissingColumnError(message, "event_date");
     if (!isSchemaMismatch) {
@@ -72,18 +62,19 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: libraryItemsWithLocale, error: libraryWithLocaleError } = await supabase
+  const { data: libraryItems, error: libraryItemsError } = await supabase
     .from("library_items")
-    .select("id, title, content_locale, category, description, file_url, post_url, preview_image_url, created_at")
+    .select("id, title, category, description, file_url, post_url, preview_image_url, created_at")
     .eq("is_public", true)
     .order("created_at", { ascending: false });
 
   const { data: libraryItemsLegacy } =
-    libraryWithLocaleError &&
-    libraryWithLocaleError.message.toLowerCase().includes("content_locale")
+    libraryItemsError &&
+    (isMissingColumnError(libraryItemsError.message ?? "", "post_url") ||
+      isMissingColumnError(libraryItemsError.message ?? "", "preview_image_url"))
       ? await supabase
           .from("library_items")
-          .select("id, title, category, description, file_url, post_url, preview_image_url, created_at")
+          .select("id, title, category, description, file_url, created_at")
           .eq("is_public", true)
           .order("created_at", { ascending: false })
       : { data: null as LibraryItem[] | null };
@@ -94,8 +85,14 @@ export default async function HomePage() {
   const upcomingEvents = await fetchUpcomingEvents(supabase, today);
 
   const items: LibraryItem[] =
-    (libraryItemsWithLocale as LibraryItem[] | null) ??
-    ((libraryItemsLegacy as LibraryItem[] | null) ?? []);
+    ((libraryItems as LibraryItem[] | null) ??
+      (libraryItemsLegacy as LibraryItem[] | null) ??
+      []
+    ).map((item) => ({
+      ...item,
+      post_url: item.post_url ?? null,
+      preview_image_url: item.preview_image_url ?? null,
+    }));
 
   return (
     <>

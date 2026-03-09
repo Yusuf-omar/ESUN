@@ -3,35 +3,40 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { ContentLocale } from "@/lib/types";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "")
   .split(",")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
-const CONTENT_LOCALES: ContentLocale[] = ["ar", "en", "tr", "all"];
-
-function normalizeContentLocale(value: string | undefined): ContentLocale {
-  if (value && CONTENT_LOCALES.includes(value as ContentLocale)) {
-    return value as ContentLocale;
-  }
-  return "ar";
-}
-
-function isMissingContentLocaleColumnError(message: string) {
-  const lower = message.toLowerCase();
-  return lower.includes("content_locale") && lower.includes("does not exist");
-}
-
 function isMissingDateColumnError(message: string) {
   const lower = message.toLowerCase();
-  return lower.includes("date") && lower.includes("does not exist");
+  return (
+    lower.includes("date") &&
+    (lower.includes("does not exist") ||
+      lower.includes("schema cache") ||
+      lower.includes("could not find"))
+  );
 }
 
 function isMissingLegacyEventDateColumnError(message: string) {
   const lower = message.toLowerCase();
-  return lower.includes("event_date") && lower.includes("does not exist");
+  return (
+    lower.includes("event_date") &&
+    (lower.includes("does not exist") ||
+      lower.includes("schema cache") ||
+      lower.includes("could not find"))
+  );
+}
+
+function isMissingLibraryColumnError(message: string, column: string) {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes(column) &&
+    (lower.includes("does not exist") ||
+      lower.includes("schema cache") ||
+      lower.includes("could not find"))
+  );
 }
 
 export async function updateApplicationStatus(
@@ -51,7 +56,6 @@ export async function updateApplicationStatus(
 
 export async function createLibraryItem(data: {
   title: string;
-  contentLocale?: ContentLocale;
   category?: string;
   description?: string;
   postUrl?: string;
@@ -62,12 +66,10 @@ export async function createLibraryItem(data: {
   const admin = createAdminClient();
 
   const title = data.title.trim();
-  const contentLocale = normalizeContentLocale(data.contentLocale);
   if (!title) throw new Error("Title is required.");
 
   const payload = {
     title,
-    content_locale: contentLocale,
     category: data.category?.trim() || null,
     description: data.description?.trim() || null,
     post_url: data.postUrl?.trim() || null,
@@ -78,13 +80,15 @@ export async function createLibraryItem(data: {
 
   const { error } = await admin.from("library_items").insert(payload);
 
-  if (error && isMissingContentLocaleColumnError(error.message ?? "")) {
+  if (
+    error &&
+    (isMissingLibraryColumnError(error.message ?? "", "post_url") ||
+      isMissingLibraryColumnError(error.message ?? "", "preview_image_url"))
+  ) {
     const { error: legacyError } = await admin.from("library_items").insert({
       title,
       category: payload.category,
       description: payload.description,
-      post_url: payload.post_url,
-      preview_image_url: payload.preview_image_url,
       file_url: payload.file_url,
       is_public: payload.is_public,
     });
@@ -118,7 +122,6 @@ export async function updateLibraryItem(
   id: string,
   data: {
     title: string;
-    contentLocale?: ContentLocale;
     category?: string;
     description?: string;
     postUrl?: string;
@@ -130,12 +133,10 @@ export async function updateLibraryItem(
   const admin = createAdminClient();
 
   const title = data.title.trim();
-  const contentLocale = normalizeContentLocale(data.contentLocale);
   if (!title) throw new Error("Title is required.");
 
   const updatePayload = {
     title,
-    content_locale: contentLocale,
     category: data.category?.trim() || null,
     description: data.description?.trim() || null,
     post_url: data.postUrl?.trim() || null,
@@ -149,15 +150,17 @@ export async function updateLibraryItem(
     .update(updatePayload)
     .eq("id", id);
 
-  if (error && isMissingContentLocaleColumnError(error.message ?? "")) {
+  if (
+    error &&
+    (isMissingLibraryColumnError(error.message ?? "", "post_url") ||
+      isMissingLibraryColumnError(error.message ?? "", "preview_image_url"))
+  ) {
     const { error: legacyError } = await admin
       .from("library_items")
       .update({
         title,
         category: updatePayload.category,
         description: updatePayload.description,
-        post_url: updatePayload.post_url,
-        preview_image_url: updatePayload.preview_image_url,
         file_url: updatePayload.file_url,
         is_public: updatePayload.is_public,
       })
@@ -198,7 +201,6 @@ export async function deleteContactMessage(id: string) {
 
 export async function createEvent(data: {
   title: string;
-  contentLocale?: ContentLocale;
   date: string;
   registrationLink?: string;
 }) {
@@ -206,14 +208,12 @@ export async function createEvent(data: {
   const admin = createAdminClient();
 
   const title = data.title.trim();
-  const contentLocale = normalizeContentLocale(data.contentLocale);
   const date = data.date.trim();
   if (!title) throw new Error("Title is required.");
   if (!date) throw new Error("Date is required.");
 
   const payload = {
     title,
-    content_locale: contentLocale,
     date,
     registration_link: data.registrationLink?.trim() || null,
   };
@@ -241,7 +241,6 @@ export async function createEvent(data: {
     insertError = error;
     const message = error.message ?? "";
     const isSchemaMismatch =
-      isMissingContentLocaleColumnError(message) ||
       isMissingDateColumnError(message) ||
       isMissingLegacyEventDateColumnError(message);
     if (!isSchemaMismatch) {

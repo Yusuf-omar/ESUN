@@ -8,6 +8,16 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
+function isMissingColumnError(message: string, column: string) {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes(column) &&
+    (lower.includes("does not exist") ||
+      lower.includes("schema cache") ||
+      lower.includes("could not find"))
+  );
+}
+
 export default async function AdminLibraryPage() {
   const supabase = await createClient();
   const {
@@ -19,23 +29,34 @@ export default async function AdminLibraryPage() {
   }
 
   const admin = createAdminClient();
-  const { data: itemsWithLocale, error: withLocaleError } = await admin
+  const { data: items, error: itemsError } = await admin
     .from("library_items")
-    .select("id, title, content_locale, category, description, file_url, post_url, preview_image_url, is_public, created_at")
+    .select("id, title, category, description, file_url, post_url, preview_image_url, is_public, created_at")
     .order("created_at", { ascending: false });
 
   const { data: legacyItems, error: legacyError } =
-    withLocaleError &&
-    withLocaleError.message.toLowerCase().includes("content_locale")
+    itemsError &&
+    (isMissingColumnError(itemsError.message ?? "", "post_url") ||
+      isMissingColumnError(itemsError.message ?? "", "preview_image_url"))
       ? await admin
           .from("library_items")
-          .select("id, title, category, description, file_url, post_url, preview_image_url, is_public, created_at")
+          .select("id, title, category, description, file_url, is_public, created_at")
           .order("created_at", { ascending: false })
-      : { data: null as { id: string }[] | null, error: withLocaleError };
+      : { data: null as { id: string }[] | null, error: itemsError };
 
-  const items = itemsWithLocale ?? legacyItems ?? [];
-  const error = withLocaleError && !withLocaleError.message.toLowerCase().includes("content_locale")
-    ? withLocaleError
+  const normalizedItems =
+    ((items as Parameters<typeof AdminLibrary>[0]["list"] | null) ??
+      (legacyItems as Parameters<typeof AdminLibrary>[0]["list"] | null) ??
+      []
+    ).map((item) => ({
+      ...item,
+      post_url: item.post_url ?? null,
+      preview_image_url: item.preview_image_url ?? null,
+    }));
+
+  const error = itemsError && !(isMissingColumnError(itemsError.message ?? "", "post_url") ||
+    isMissingColumnError(itemsError.message ?? "", "preview_image_url"))
+    ? itemsError
     : legacyError;
 
   return (
@@ -47,7 +68,7 @@ export default async function AdminLibraryPage() {
           {error.message}
         </p>
       )}
-      <AdminLibrary list={items as Parameters<typeof AdminLibrary>[0]["list"]} />
+      <AdminLibrary list={normalizedItems} />
     </div>
   );
 }

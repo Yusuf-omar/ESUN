@@ -11,18 +11,17 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "")
 
 function isMissingColumnError(message: string, column: string) {
   const lower = message.toLowerCase();
-  return lower.includes(column) && lower.includes("does not exist");
+  return (
+    lower.includes(column) &&
+    (lower.includes("does not exist") ||
+      lower.includes("schema cache") ||
+      lower.includes("could not find"))
+  );
 }
 
 async function fetchAdminEvents(admin: ReturnType<typeof createAdminClient>) {
   const attempts = [
-    () => admin.from("events").select("id, title, content_locale, date, registration_link").order("date", { ascending: true }),
     () => admin.from("events").select("id, title, date, registration_link").order("date", { ascending: true }),
-    () =>
-      admin
-        .from("events")
-        .select("id, title, content_locale, date:event_date, registration_link")
-        .order("event_date", { ascending: true }),
     () => admin.from("events").select("id, title, date:event_date, registration_link").order("event_date", { ascending: true }),
   ];
 
@@ -32,7 +31,6 @@ async function fetchAdminEvents(admin: ReturnType<typeof createAdminClient>) {
 
     const message = error.message ?? "";
     const isSchemaMismatch =
-      isMissingColumnError(message, "content_locale") ||
       isMissingColumnError(message, "date") ||
       isMissingColumnError(message, "event_date");
     if (!isSchemaMismatch) {
