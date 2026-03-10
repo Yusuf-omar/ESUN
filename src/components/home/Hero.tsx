@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { HeroLogo } from "./HeroLogo";
 import { useI18n } from "@/components/providers/I18nProvider";
 
@@ -10,7 +11,7 @@ function scrollToJoin() {
   });
 }
 
-export function Hero() {
+export function Hero({ isSignedIn }: { isSignedIn: boolean }) {
   const { copy } = useI18n();
 
   return (
@@ -57,22 +58,37 @@ export function Hero() {
             {copy.hero.subtitle}
           </motion.p>
         </div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-        >
-          <motion.button
-            onClick={scrollToJoin}
-            className="rounded-lg bg-[#a81123] px-6 py-3 text-base font-bold text-white sm:px-8 sm:py-4 sm:text-lg"
-            whileTap={{ scale: 0.97 }}
-            whileHover={{
-              boxShadow: "0 0 24px rgba(168, 17, 35, 0.5)",
-            }}
+        {isSignedIn ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
           >
-            {copy.hero.cta}
-          </motion.button>
-        </motion.div>
+            <Link
+              href="/dashboard"
+              className="inline-block rounded-lg bg-[#a81123] px-6 py-3 text-base font-bold text-white sm:px-8 sm:py-4 sm:text-lg"
+            >
+              {copy.nav.dashboard}
+            </Link>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+          >
+            <motion.button
+              onClick={scrollToJoin}
+              className="rounded-lg bg-[#a81123] px-6 py-3 text-base font-bold text-white sm:px-8 sm:py-4 sm:text-lg"
+              whileTap={{ scale: 0.97 }}
+              whileHover={{
+                boxShadow: "0 0 24px rgba(168, 17, 35, 0.5)",
+              }}
+            >
+              {copy.hero.cta}
+            </motion.button>
+          </motion.div>
+        )}
       </motion.div>
     </section>
   );

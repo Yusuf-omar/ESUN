@@ -9,6 +9,10 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
+export type AdminActionResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
 function isMissingDateColumnError(message: string) {
   const lower = message.toLowerCase();
   return (
@@ -52,47 +56,72 @@ function isMissingArchivedAtColumnError(message: string) {
 export async function updateApplicationStatus(
   id: string,
   status: string
-) {
-  await ensureAdmin();
-  const admin = createAdminClient();
-  const { error } = await admin
-    .from("applications")
-    .update({ status })
-    .eq("id", id);
-  if (error) throw new Error(error.message);
-  revalidatePath("/admin");
-  revalidatePath("/admin/applications");
-}
-
-export async function archiveApplication(id: string) {
-  await ensureAdmin();
-  const admin = createAdminClient();
-  const { error } = await admin
-    .from("applications")
-    .update({ archived_at: new Date().toISOString() })
-    .eq("id", id);
-
-  if (error) {
-    if (isMissingArchivedAtColumnError(error.message ?? "")) {
-      throw new Error(
-        "Archive column is missing. Run the latest supabase/schema.sql migration."
-      );
+): Promise<AdminActionResult> {
+  try {
+    await ensureAdmin();
+    const admin = createAdminClient();
+    const { error } = await admin
+      .from("applications")
+      .update({ status })
+      .eq("id", id);
+    if (error) {
+      return { ok: false, error: "Failed to update application status." };
     }
-    throw new Error(error.message);
-  }
 
-  revalidatePath("/admin");
-  revalidatePath("/admin/applications");
+    revalidatePath("/admin");
+    revalidatePath("/admin/applications");
+    return { ok: true };
+  } catch (error) {
+    console.error("updateApplicationStatus failed:", error);
+    return { ok: false, error: "Failed to update application status." };
+  }
 }
 
-export async function deleteApplication(id: string) {
-  await ensureAdmin();
-  const admin = createAdminClient();
-  const { error } = await admin.from("applications").delete().eq("id", id);
-  if (error) throw new Error(error.message);
+export async function archiveApplication(id: string): Promise<AdminActionResult> {
+  try {
+    await ensureAdmin();
+    const admin = createAdminClient();
+    const { error } = await admin
+      .from("applications")
+      .update({ archived_at: new Date().toISOString() })
+      .eq("id", id);
 
-  revalidatePath("/admin");
-  revalidatePath("/admin/applications");
+    if (error) {
+      if (isMissingArchivedAtColumnError(error.message ?? "")) {
+        return {
+          ok: false,
+          error:
+            "Archive feature needs a database update. Run the latest supabase/schema.sql migration.",
+        };
+      }
+      return { ok: false, error: "Failed to archive request." };
+    }
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/applications");
+    return { ok: true };
+  } catch (error) {
+    console.error("archiveApplication failed:", error);
+    return { ok: false, error: "Failed to archive request." };
+  }
+}
+
+export async function deleteApplication(id: string): Promise<AdminActionResult> {
+  try {
+    await ensureAdmin();
+    const admin = createAdminClient();
+    const { error } = await admin.from("applications").delete().eq("id", id);
+    if (error) {
+      return { ok: false, error: "Failed to delete request." };
+    }
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/applications");
+    return { ok: true };
+  } catch (error) {
+    console.error("deleteApplication failed:", error);
+    return { ok: false, error: "Failed to delete request." };
+  }
 }
 
 export async function createLibraryItem(data: {

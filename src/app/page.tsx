@@ -98,7 +98,7 @@ export default async function HomePage() {
     <>
       <Nav />
       <main>
-        <Hero />
+        <Hero isSignedIn={!!user} />
         <OurStory />
         <ServiceHub onSubmitApplication={submitApplication} isSignedIn={!!user} />
         <UpcomingEvents events={upcomingEvents} />

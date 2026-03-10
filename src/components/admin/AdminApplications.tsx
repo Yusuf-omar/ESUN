@@ -47,7 +47,11 @@ export function AdminApplications({ list }: { list: AppRow[] }) {
     setError("");
     setBusyId(id);
     try {
-      await updateApplicationStatus(id, status);
+      const result = await updateApplicationStatus(id, status);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
       setStatuses((s) => ({ ...s, [id]: status }));
     } catch (err) {
       const msg =
@@ -62,7 +66,11 @@ export function AdminApplications({ list }: { list: AppRow[] }) {
     setError("");
     setBusyId(id);
     try {
-      await archiveApplication(id);
+      const result = await archiveApplication(id);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
       const archivedAt = new Date().toISOString();
       setRows((prev) =>
         prev.map((app) =>
@@ -81,7 +89,11 @@ export function AdminApplications({ list }: { list: AppRow[] }) {
     setError("");
     setBusyId(id);
     try {
-      await deleteApplication(id);
+      const result = await deleteApplication(id);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
       setRows((prev) => prev.filter((app) => app.id !== id));
       setStatuses((prev) => {
         const next = { ...prev };
