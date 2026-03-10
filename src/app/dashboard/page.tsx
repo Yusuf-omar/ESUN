@@ -4,6 +4,16 @@ import { ProfileSection } from "@/components/dashboard/ProfileSection";
 import { UnionCard } from "@/components/dashboard/UnionCard";
 import { StatusTracker } from "@/components/dashboard/StatusTracker";
 
+function isMissingArchivedAtColumnError(message: string) {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes("archived_at") &&
+    (lower.includes("does not exist") ||
+      lower.includes("schema cache") ||
+      lower.includes("could not find"))
+  );
+}
+
 type ProfileRow = {
   id: string;
   full_name: string | null;
@@ -74,17 +84,29 @@ export default async function DashboardPage() {
     );
   }
 
-  const { data: applications } = await supabase
+  const { data: applicationsWithArchive, error: withArchiveError } = await supabase
     .from("applications")
-    .select("id, service_type, description, status, created_at")
+    .select("id, service_type, description, status, archived_at, created_at")
     .eq("user_id", user.id)
+    .is("archived_at", null)
     .order("created_at", { ascending: false });
+
+  const { data: applicationsLegacy } =
+    withArchiveError && isMissingArchivedAtColumnError(withArchiveError.message ?? "")
+      ? await supabase
+          .from("applications")
+          .select("id, service_type, description, status, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+      : { data: null as { id: string }[] | null };
+
+  const applications = applicationsWithArchive ?? applicationsLegacy ?? [];
 
   return (
     <div className="space-y-12">
       <ProfileSection profile={mergedProfile} />
       <UnionCard profile={mergedProfile} />
-      <StatusTracker applications={applications ?? []} />
+      <StatusTracker applications={applications} />
     </div>
   );
 }

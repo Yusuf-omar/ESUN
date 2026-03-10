@@ -6,6 +6,7 @@ import { TapButton } from "@/components/ui/TapButton";
 import type { ServiceType } from "@/lib/types";
 import { getServiceLabels } from "@/lib/i18n";
 import { useI18n } from "@/components/providers/I18nProvider";
+import type { ActionResult } from "@/app/actions";
 
 const STUDENT_ID_REGEX = /^\d{11}$/;
 
@@ -19,7 +20,7 @@ interface ServiceModalProps {
     studentId?: string;
     issue: string;
     serviceType: ServiceType;
-  }) => Promise<void>;
+  }) => Promise<ActionResult>;
 }
 
 export function ServiceModal({
@@ -60,12 +61,16 @@ export function ServiceModal({
     }
     setLoading(true);
     try {
-      await onSubmit({
+      const result = await onSubmit({
         name: isSignedIn ? undefined : name.trim(),
         studentId: isSignedIn ? undefined : studentId.replace(/\s/g, ""),
         issue: issue.trim(),
         serviceType,
       });
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
       setName("");
       setStudentId("");
       setIssue("");
@@ -159,4 +164,3 @@ export function ServiceModal({
     </AnimatePresence>
   );
 }
-

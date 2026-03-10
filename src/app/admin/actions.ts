@@ -39,6 +39,16 @@ function isMissingLibraryColumnError(message: string, column: string) {
   );
 }
 
+function isMissingArchivedAtColumnError(message: string) {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes("archived_at") &&
+    (lower.includes("does not exist") ||
+      lower.includes("schema cache") ||
+      lower.includes("could not find"))
+  );
+}
+
 export async function updateApplicationStatus(
   id: string,
   status: string
@@ -50,6 +60,37 @@ export async function updateApplicationStatus(
     .update({ status })
     .eq("id", id);
   if (error) throw new Error(error.message);
+  revalidatePath("/admin");
+  revalidatePath("/admin/applications");
+}
+
+export async function archiveApplication(id: string) {
+  await ensureAdmin();
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("applications")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) {
+    if (isMissingArchivedAtColumnError(error.message ?? "")) {
+      throw new Error(
+        "Archive column is missing. Run the latest supabase/schema.sql migration."
+      );
+    }
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/applications");
+}
+
+export async function deleteApplication(id: string) {
+  await ensureAdmin();
+  const admin = createAdminClient();
+  const { error } = await admin.from("applications").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
   revalidatePath("/admin");
   revalidatePath("/admin/applications");
 }

@@ -33,6 +33,9 @@ create table if not exists public.applications (
   ),
   created_at timestamptz not null default now()
 );
+alter table public.applications add column if not exists archived_at timestamptz;
+create index if not exists applications_archived_created_idx
+  on public.applications (archived_at, created_at desc);
 
 -- Events (for admin and community)
 create table if not exists public.events (

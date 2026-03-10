@@ -10,6 +10,10 @@ const CONTACT_MIN_INTERVAL_MS = 60_000;
 const CONTACT_MAX_PER_HOUR = 5;
 const APPLICATION_MAX_PER_HOUR = 6;
 
+export type ActionResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
 function normalizePhone(value: string) {
   const cleaned = value.replace(/[^\d+]/g, "");
   if (cleaned.startsWith("+")) {
@@ -42,73 +46,88 @@ export async function submitApplication(data: {
   studentId?: string;
   issue: string;
   serviceType: ServiceType;
-}) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    throw new Error("Please sign in to submit an application.");
+}): Promise<ActionResult> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return { ok: false, error: "Please sign in to submit an application." };
+    }
+    if (!isAllowedEmail(user.email)) {
+      return { ok: false, error: "This account is not allowed to submit requests." };
+    }
+    if (!user.email_confirmed_at) {
+      return { ok: false, error: "Please verify your email before submitting a request." };
+    }
+
+    const issue = data.issue.trim();
+    if (!issue) {
+      return { ok: false, error: "Please describe your request." };
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name, student_number")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const meta = (user.user_metadata ?? {}) as {
+      full_name?: unknown;
+      student_number?: unknown;
+    };
+
+    const fullName = pickFirstNonEmpty(
+      profile?.full_name,
+      typeof meta.full_name === "string" ? meta.full_name : undefined,
+      data.name
+    );
+
+    const studentId = pickFirstNonEmpty(
+      profile?.student_number,
+      typeof meta.student_number === "string" ? meta.student_number : undefined,
+      data.studentId?.replace(/\s/g, "")
+    );
+
+    if (!fullName || !/^\d{11}$/.test(studentId)) {
+      return {
+        ok: false,
+        error: "Profile data is incomplete. Please update your name and student number.",
+      };
+    }
+
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count: recentCount, error: countError } = await supabase
+      .from("applications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .gte("created_at", oneHourAgo);
+    if (countError) {
+      return { ok: false, error: "Could not validate request rate. Please try again." };
+    }
+    if ((recentCount ?? 0) >= APPLICATION_MAX_PER_HOUR) {
+      return {
+        ok: false,
+        error: "Too many requests. Please wait before submitting again.",
+      };
+    }
+
+    const { error } = await supabase.from("applications").insert({
+      user_id: user.id,
+      service_type: data.serviceType,
+      description: `Name: ${fullName}\nStudent ID: ${studentId}\n\n${issue}`,
+      status: "pending",
+    });
+    if (error) {
+      return { ok: false, error: "Failed to submit your request. Please try again." };
+    }
+
+    return { ok: true };
+  } catch (error) {
+    console.error("submitApplication failed:", error);
+    return { ok: false, error: "Failed to submit your request. Please try again." };
   }
-  if (!isAllowedEmail(user.email)) {
-    throw new Error("This account is not allowed to submit requests.");
-  }
-  if (!user.email_confirmed_at) {
-    throw new Error("Please verify your email before submitting a request.");
-  }
-
-  const issue = data.issue.trim();
-  if (!issue) {
-    throw new Error("Please describe your request.");
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name, student_number")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  const meta = (user.user_metadata ?? {}) as {
-    full_name?: unknown;
-    student_number?: unknown;
-  };
-
-  const fullName = pickFirstNonEmpty(
-    profile?.full_name,
-    typeof meta.full_name === "string" ? meta.full_name : undefined,
-    data.name
-  );
-
-  const studentId = pickFirstNonEmpty(
-    profile?.student_number,
-    typeof meta.student_number === "string" ? meta.student_number : undefined,
-    data.studentId?.replace(/\s/g, "")
-  );
-
-  if (!fullName || !/^\d{11}$/.test(studentId)) {
-    throw new Error("Profile data is incomplete. Please update your name and student number.");
-  }
-
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  const { count: recentCount, error: countError } = await supabase
-    .from("applications")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .gte("created_at", oneHourAgo);
-  if (countError) {
-    throw new Error("Could not validate request rate. Please try again.");
-  }
-  if ((recentCount ?? 0) >= APPLICATION_MAX_PER_HOUR) {
-    throw new Error("Too many requests. Please wait before submitting again.");
-  }
-
-  const { error } = await supabase.from("applications").insert({
-    user_id: user.id,
-    service_type: data.serviceType,
-    description: `Name: ${fullName}\nStudent ID: ${studentId}\n\n${issue}`,
-    status: "pending",
-  });
-  if (error) throw new Error(error.message);
 }
 
 export async function sendMessage(data: {

@@ -13,6 +13,7 @@ export interface Application {
   service_type: ServiceType;
   description: string;
   status: ApplicationStatus;
+  archived_at?: string | null;
   created_at: string;
 }
 

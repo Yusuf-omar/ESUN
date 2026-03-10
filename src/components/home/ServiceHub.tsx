@@ -5,6 +5,7 @@ import { ServiceCard } from "./ServiceCard";
 import { ServiceModal } from "./ServiceModal";
 import type { ServiceType } from "@/lib/types";
 import { useI18n } from "@/components/providers/I18nProvider";
+import type { ActionResult } from "@/app/actions";
 
 interface ServiceHubProps {
   onSubmitApplication: (data: {
@@ -12,7 +13,7 @@ interface ServiceHubProps {
     studentId?: string;
     issue: string;
     serviceType: ServiceType;
-  }) => Promise<void>;
+  }) => Promise<ActionResult>;
   isSignedIn: boolean;
 }
 
